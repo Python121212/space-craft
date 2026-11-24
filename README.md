@@ -6,17 +6,18 @@
 
 ## 配布物
 
-**正式な配布物は GitHub Release です。**
+**配布物は GitHub Release に一本化しています。リポジトリ内に jar は置いていません。**
 
 | 場所 | 内容 |
 | --- | --- |
 | [Release `v1.0.0`](https://github.com/Python121212/space-craft/releases/tag/v1.0.0) | `spacecraft-1.0.0.jar`（GitHub Actions が JDK 17 + Gradle 8.1.1 でビルドしたもの） |
-| `dist/spacecraft-1.0.0.jar` | 同じ内容の jar をリポジトリにも同梱 |
 
 ```bash
 gh release view v1.0.0                 # リリースの確認
 gh release download v1.0.0 -p '*.jar'  # jar を取得
 ```
+
+直接ダウンロード: https://github.com/Python121212/space-craft/releases/download/v1.0.0/spacecraft-1.0.0.jar
 
 jar の中身は 4 ファイルだけです:
 
@@ -75,7 +76,7 @@ gradle runServer                        # 開発用サーバー起動
 ## 導入して確認する
 
 1. Minecraft 1.20.1 に **Forge 47.x** をインストールする
-2. Release から取得した `spacecraft-1.0.0.jar`（または `dist/` の同名ファイル）を `.minecraft/mods/`（サーバーなら `mods/`）へコピーする
+2. Release から取得した `spacecraft-1.0.0.jar` を `.minecraft/mods/`（サーバーなら `mods/`）へコピーする
 3. 起動し、Mods 一覧に **Space Craft 1.0.0** が表示されれば成功
 
 何も登録していないので、ゲーム内の挙動は変わりません。`latest.log` に `spacecraft` の読み込みが出ます。
@@ -89,7 +90,6 @@ settings.gradle / build.gradle    ForgeGradle 6 ビルド定義
 src/main/java/.../SpaceCraft.java 空の @Mod クラス
 src/main/resources/META-INF/mods.toml
 src/main/resources/pack.mcmeta
-dist/spacecraft-1.0.0.jar        同梱の jar（正式配布は GitHub Release）
 LICENSE                           MIT
 AGENTS.md                         エージェントへの指示（日本語応答など）
 ```

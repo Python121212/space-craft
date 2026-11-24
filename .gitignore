@@ -17,4 +17,5 @@ src/generated/resources/.cache/
 # OS
 .DS_Store
 
-# NOTE: dist/ is intentionally NOT ignored - it holds the built mod JAR.
+# ビルド済み jar は GitHub Release に置くため、リポジトリには含めません
+dist/
