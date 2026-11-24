@@ -21,11 +21,13 @@
 
 | 種類 | ファイル | 状態 |
 | --- | --- | --- |
-| **JSON から組み立てた 3D 画像** | `images/<id>_3d.png` | 未配置 |
+| **JSON から組み立てた 3D 画像** | `images/<id>_3d.svg` | 未配置 |
+
+> **ブロックは必ず 3D**。`models/<id>.json` の `elements` から `tools/model3d.py` が等角投影で描きます。
 
 画像を置いたら下のコメントを外してください。
 
-<!-- ![<日本語名> の 3D モデル](images/<id>_3d.png) -->
+<!-- ![<日本語名> の 3D モデル](images/<id>_3d.svg) -->
 
 ### 元データ（必ずリンクする）
 
@@ -120,7 +122,7 @@
 
 - [ ] `<...>` をすべて埋めた
 - [ ] `models/<id>.json` と `blockstates/<id>.json` を作った
-- [ ] JSON から `images/<id>_3d.png` を組み立てた
+- [ ] JSON の `elements` から `images/<id>_3d.svg` を組み立てた（3D 必須）
 - [ ] md から JSON へリンクし、画像コメントを外した
 - [ ] 「使い方」をすべて書いた
 - [ ] [`README.md`](README.md) の表に 1 行追加した

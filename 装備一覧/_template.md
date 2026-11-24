@@ -22,17 +22,19 @@
 
 | 種類 | ファイル | 状態 |
 | --- | --- | --- |
-| **手に持った状態**（JSON から組み立て） | `images/<id>_held.png` | 未配置 |
-| **インベントリ内の状態** | `images/<id>_inventory.png` | 未配置 |
-| **装備した状態** | `images/<id>_equipped.png` | 未配置 |
-| 3D モデル（任意） | `images/<id>_3d.png` | 未配置 |
+| **3D モデル全体図**（必須） | `images/<id>_3d.svg` | 未配置 |
+| **手に持った状態**（3D・JSON から組み立て） | `images/<id>_held.svg` | 未配置 |
+| **インベントリ内の状態**（3D） | `images/<id>_inventory.svg` | 未配置 |
+| **装備した状態**（3D） | `images/<id>_equipped.svg` | 未配置 |
+
+> **装備は必ず 3D**。4 枚とも `models/<id>.json` の `elements` を元に組み立ててください。
 
 画像を `images/` に置いたら下のコメントを外してください。
 
-<!-- ![手に持った <日本語名>](images/<id>_held.png) -->
-<!-- ![インベントリ内の <日本語名>](images/<id>_inventory.png) -->
-<!-- ![装備した <日本語名>](images/<id>_equipped.png) -->
-<!-- ![<日本語名> の 3D モデル](images/<id>_3d.png) -->
+<!-- ![<日本語名> の 3D モデル](images/<id>_3d.svg) -->
+<!-- ![手に持った <日本語名>](images/<id>_held.svg) -->
+<!-- ![インベントリ内の <日本語名>](images/<id>_inventory.svg) -->
+<!-- ![装備した <日本語名>](images/<id>_equipped.svg) -->
 
 ## モデル（JSON から組み立てる）
 
@@ -71,9 +73,9 @@
 - 修繕・耐久エンチャント: <挙動>
 
 ### 手に持った状態 / インベントリ内 / 装備時
-- **手持ち**: `display.firstperson_*` の見た目（`..._held.png` と対応）
-- **インベントリ内**: アイコン・ツールチップ・耐久ゲージ（`..._inventory.png` と対応）
-- **装備時**: プレイヤーモデル上の見た目、腕・防具レイヤー、発光・パーティクル（`..._equipped.png` と対応）
+- **手持ち**: `display.firstperson_*` の見た目（`..._held.svg` と対応）
+- **インベントリ内**: アイコン・ツールチップ・耐久ゲージ（`..._inventory.svg` と対応）
+- **装備時**: プレイヤーモデル上の見た目、腕・防具レイヤー、発光・パーティクル（`..._equipped.svg` と対応）
 
 ### 使用・右クリック
 - 右クリック: <挙動>
@@ -123,7 +125,7 @@
 
 - [ ] `<...>` をすべて埋めた
 - [ ] `models/<id>.json` を作った
-- [ ] `..._held.png` / `..._inventory.png` / `..._equipped.png` を置いた
+- [ ] `..._3d.svg` / `..._held.svg` / `..._inventory.svg` / `..._equipped.svg` を置いた（すべて 3D）
 - [ ] md から JSON へリンクし、画像コメントを外した
 - [ ] 「使い方」をすべて書いた
 - [ ] [`README.md`](README.md) と `アイテム一覧/README.md` に 1 行追加した
