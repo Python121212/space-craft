@@ -52,6 +52,8 @@ gh run download <run-id> -n spacecraft-1.20.1-forge
 
 > ネットワーク制限のあるサンドボックスからは Artifact / ログの実体（GitHub の blob ストレージ）をダウンロードできませんが、ビルドと Release への添付は GitHub 側で完結します。
 
+> 使用するアクションは **Node.js 24 対応のメジャー**（`checkout@v7` / `setup-java@v6` / `setup-gradle@v5` / `upload-artifact@v7`）に統一しています。`gradle/actions` は v6 でキャッシュのライセンスが変わるため、MIT のままの v5 を採用しています。
+
 > **Python は使用していません。** ビルドは Java / Gradle、検査は `jar`・`unzip`・`grep` だけです。GitHub アカウント名に由来する `Python121212` という文字列（パッケージ名・著者名）はそのまま残っています。
 
 > このリポジトリでの応答・説明は **日本語** に統一しています（`AGENTS.md` 参照）。
