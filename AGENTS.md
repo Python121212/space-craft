@@ -12,7 +12,9 @@
 - 設定値の唯一の来源は `gradle.properties`（mod ID・バージョン・Forge バージョン・pack_format など）。
 - 現状は「何も登録しない空の mod」。`@Mod("spacecraft")` が付いたエントリポイントクラスが 1 つだけです。
 - **正式なビルドは GitHub Actions**（`.github/workflows/build.yml`）で JDK 17 + Gradle 8.1.1 を使って行います。
-- JDK / Gradle の無いサンドボックスでのみ `python3 tools/make_jar.py` を使って jar を直接組み立てます。これは検証用の代替手段であり、正式ビルドの代わりではありません。
+- **配布用の jar は GitHub Release**（タグ `v1.0.0`）。`main` への push で Actions がビルド結果を自動で添付／差し替えます。
+- **Python は使用しません。** ビルドは Java / Gradle、検査は `jar`・`unzip`・`grep` のみです。Python スクリプトを追加・復活させないでください。
+- なお `Python121212` は GitHub アカウント名であり、パッケージ名や著者名に含まれる文字列です。これは削除対象ではありません。
 
 ## ブランチ運用
 

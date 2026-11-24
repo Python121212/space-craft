@@ -1,6 +1,6 @@
 # Forge 1.20.1 mod descriptor.
-# Placeholders are expanded by Gradle's processResources (build.gradle)
-# and by tools/make_jar.py, both reading gradle.properties.
+# プレースホルダは build.gradle の processResources が
+# gradle.properties の値で展開します。
 
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
