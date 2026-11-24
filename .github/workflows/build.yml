@@ -21,17 +21,20 @@ jobs:
     timeout-minutes: 40
 
     steps:
+      # すべて Node.js 24 対応のメジャーに統一しています（Node 20 の非推奨警告を出さないため）。
+      # gradle/actions は v6 でキャッシュが Gradle 独自の利用規約に変わるため、
+      # MIT のまま Node 24 に対応した v5 を採用しています。
       - name: チェックアウト
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: JDK 17 を準備
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Gradle 8.1.1 を準備
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: '8.1.1'
 
@@ -51,7 +54,7 @@ jobs:
           unzip -p "$JAR" META-INF/mods.toml | grep -F 'modId="spacecraft"'
 
       - name: mod JAR を Artifact として保存
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: spacecraft-1.20.1-forge
           path: build/libs/*.jar
