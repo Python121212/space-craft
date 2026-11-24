@@ -8,24 +8,24 @@
 
 ## プロジェクト概要
 
-- Minecraft **1.20.1 / Forge 47.x** の mod。Java 17、ForgeGradle 6、Gradle 8.1.1。
+- **テーマは宇宙クラフト（Space Craft）**。Minecraft **1.20.1 / Forge 47.x** の mod。Java 17、ForgeGradle 6、Gradle 8.1.1。
 - 設定値の唯一の来源は `gradle.properties`（mod ID・バージョン・Forge バージョン・pack_format など）。
-- 現状は「何も登録しない空の mod」。`@Mod("spacecraft")` が付いたエントリポイントクラスが 1 つだけです。
+- `@Mod("spacecraft")` のエントリポイント `SpaceCraft.java` が `DeferredRegister` でアイテムとクリエイティブタブを登録します。**最初のアイテムは `wrench`**（`item/WrenchItem.java`、ブロックを右クリックで 90 度回転）。タブ名は「宇宙クラフト」。
 - **正式なビルドは GitHub Actions**（`.github/workflows/build.yml`）で JDK 17 + Gradle 8.1.1 を使って行います。
+- **配布用の jar は GitHub Release のみ**（タグ `v1.0.0`）。`main` への push で Actions が自動で添付／差し替えます。**リポジトリ内には jar を置きません**（`dist/` は削除済み、`.gitignore` にも登録）。
 - Actions のアクションは **Node.js 24 対応メジャーを維持**してください（`checkout@v7` / `setup-java@v6` / `setup-gradle@v5` / `upload-artifact@v7`）。Node 20 系へ戻すと非推奨警告が再発します。`gradle/actions` は v6 でキャッシュのライセンスが変わるため、MIT の v5 で固定しています。
-- **配布用の jar は GitHub Release のみ**（タグ `v1.0.0`）。`main` への push で Actions がビルド結果を自動で添付／差し替えます。**リポジトリ内には jar を置きません**（`dist/` は削除済み、`.gitignore` にも登録）。
-- **Python は一覧ドキュメントの補助として使って構いません**（`tools/catalog.py`）。標準ライブラリのみで、一覧の検証・新規 md 作成・モデル JSON からの 3D SVG 生成を行います。以前スクリプトを消したのは「未使用だから整理した」だけであり、Python 自体を禁止したわけではありません。
+- **Python は一覧ドキュメントの補助として使って構いません**（`tools/catalog.py` / `tools/itemart.py`）。標準ライブラリのみで、一覧の検証・新規 md 作成・モデル JSON からの 3D SVG 生成・16×16 テクスチャと画像の生成を行います。以前スクリプトを消したのは「未使用だから整理した」だけであり、Python 自体を禁止したわけではありません。
 - ビルド本体は Java / Gradle、jar の検査は `jar`・`unzip`・`grep` です。Python を Gradle や CI の必須ステップに組み込まないでください（一覧の更新はビルド不要です）。
 - なお `Python121212` は GitHub アカウント名であり、パッケージ名や著者名に含まれる文字列です。これは削除対象ではありません。
 
 ## 一覧ドキュメントの運用
 
 - ルート直下の 5 一覧（`アイテム一覧/`・`block一覧/`・`Ui一覧/`・`装備一覧/`・`エンティティ一覧（スポーンエッグに限る）/`）は**ユーザーが作成したもの**です。削除・改名せず、各ディレクトリの `ここに追加` も残してください。
-- アイテム / ブロック / UI / 装備 / エンティティ（スポーンエッグに限る）を 1 つ追加したら、対応する一覧の `_template.md` を `<id>.md` にコピーして追加し、一覧の `README.md` にも 1 行足します。
+- アイテム / ブロック / UI / 装備 / エンティティ（スポーンエッグに限る）を 1 つ追加したら、対応する一覧の `_template.md` を `<id>.md` にコピーして追加し、一覧の `README.md` にも 1 行足します（`python3 tools/catalog.py new <一覧> <id>` で自動化できます）。
 - md には指定された画像を**すべて**入れてください: ブロック = JSON 由来の 3D、アイテム = インベントリ内 + 手持ち、UI = UI 画像、装備 = 手持ち + インベントリ内 + 装備時、エンティティ = スポーンエッグ + 見た目 3D + エッグ手持ち。画像は `images/`、モデルは `models/`・`blockstates/` の JSON に置きます。
 - md には**その要素の使い方をすべて**書いてください（テンプレートに項目を用意しています）。
+- 実装されていない要素の md やダミー画像は作らないでください。**実装済みの要素（現在は `wrench`）は md と画像を揃えてください**。
 - **一覧の更新はビルド不要**です。`.github/workflows/build.yml` の `paths-ignore` で除外されており、jar にも含まれません。`gradle build` や `gh workflow run` を一覧のために実行しないでください。
-- 現状は空の mod なので、実装されていない要素の md やダミー画像は作らないでください。
 
 ## ブランチ運用
 

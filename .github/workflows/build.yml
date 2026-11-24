@@ -48,7 +48,17 @@ jobs:
           gradle-version: '8.1.1'
 
       - name: gradle build を実行
-        run: gradle build --no-daemon --stacktrace
+        id: build
+        run: |
+          set -o pipefail
+          gradle build --no-daemon --stacktrace 2>&1 | tee /tmp/gradle-build.log
+
+      # ログの実体を取得できない環境でも、失敗原因を PR のアノテーションで読めるようにする
+      - name: ビルドエラーの要約を表示
+        if: failure() && steps.build.outcome == 'failure'
+        run: |
+          grep -E '(error:|FAILURE:|What went wrong|^\* Try|FAILED$|Execution failed|Caused by:|cannot find symbol|incompatible types|no suitable method|does not exist|Compilation failed)' /tmp/gradle-build.log \
+            | head -n 40 | while IFS= read -r line; do echo "::error::$line"; done
 
       - name: 生成された JAR を検査
         run: |
@@ -79,7 +89,7 @@ jobs:
           VERSION=$(grep '^mod_version=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
           TAG="v${VERSION}"
           JAR=$(ls build/libs/*.jar | head -n 1)
-          NOTES="Minecraft 1.20.1 / Forge 47.x 向けの空の mod です。JDK 17 + Gradle 8.1.1 でビルドした jar を添付しています。ブロック・アイテムなどは未登録で、Forge が mod として読み込むことだけを確認する jar です。Forge 47.x の mods/ に置いて起動すると、Mods 一覧に Space Craft と表示されます。"
+          NOTES="Minecraft 1.20.1 / Forge 47.x 向けの宇宙クラフト mod です。JDK 17 + Gradle 8.1.1 でビルドした jar を添付しています。最初のアイテムとしてレンチ（spacecraft:wrench）を収録: ブロックを右クリックすると 90 度回転します。クリエイティブタブ「宇宙クラフト」から入手でき、サバイバルでは /give @s spacecraft:wrench を使ってください。Forge 47.x の mods/ に置いて起動すると、Mods 一覧に Space Craft と表示されます。"
 
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "既存リリース $TAG のアセットを差し替えます"

@@ -88,7 +88,7 @@ def cmd_list() -> int:
         total += len(mds)
         print(f"■ {name}  （{len(mds)} 件）")
         if not mds:
-            print("   （未登録 — 空の mod なので正常です）")
+            print("   （未登録 — 実装済みの要素はまだありません）")
         for md in mds:
             status = []
             for suffix in cfg["images"]:

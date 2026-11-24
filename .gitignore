@@ -19,3 +19,7 @@ src/generated/resources/.cache/
 
 # ビルド済み jar は GitHub Release に置くため、リポジトリには含めません
 dist/
+
+# Python の一覧補助ツールが作るキャッシュ
+__pycache__/
+*.pyc
