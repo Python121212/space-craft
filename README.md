@@ -54,7 +54,7 @@ gh run download <run-id> -n spacecraft-1.20.1-forge
 
 > 使用するアクションは **Node.js 24 対応のメジャー**（`checkout@v7` / `setup-java@v6` / `setup-gradle@v5` / `upload-artifact@v7`）に統一しています。`gradle/actions` は v6 でキャッシュのライセンスが変わるため、MIT のままの v5 を採用しています。
 
-> **Python は使用していません。** ビルドは Java / Gradle、検査は `jar`・`unzip`・`grep` だけです。GitHub アカウント名に由来する `Python121212` という文字列（パッケージ名・著者名）はそのまま残っています。
+> **Python は一覧ドキュメントの補助に使っています**（[`tools/catalog.py`](tools/catalog.py)、標準ライブラリのみ）。ビルド本体は Java / Gradle、jar の検査は `jar`・`unzip`・`grep` で、Python はビルドに必須ではありません。`Python121212` は GitHub アカウント名由来のパッケージ名・著者名です。
 
 > このリポジトリでの応答・説明は **日本語** に統一しています（`AGENTS.md` 参照）。
 
@@ -89,6 +89,11 @@ gradle runServer                        # 開発用サーバー起動
 gradle.properties                 設定値（ここだけ編集すればよい）
 settings.gradle / build.gradle    ForgeGradle 6 ビルド定義
 .github/workflows/build.yml      ビルド + Release への添付
+tools/catalog.py                 一覧ドキュメントの管理（Python・ビルド不要）
+一覧の使い方.md                  5 つの一覧の運用ルール
+アイテム一覧/ block一覧/ Ui一覧/
+装備一覧/ エンティティ一覧（スポーンエッグに限る）/
+                                 要素ごとの md・画像・モデル JSON
 src/main/java/.../SpaceCraft.java 空の @Mod クラス
 src/main/resources/META-INF/mods.toml
 src/main/resources/pack.mcmeta
