@@ -1,0 +1,59 @@
+name: Forge 1.20.1 ビルド
+
+on:
+  push:
+    branches:
+      - main
+      - 'arena/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: 'build-${{ github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: JDK 17 + Gradle 8.1.1 でビルド
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v4
+
+      - name: JDK 17 を準備
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle 8.1.1 を準備
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.1.1'
+
+      - name: gradle build を実行
+        run: gradle build --no-daemon --stacktrace
+
+      - name: 生成された JAR を検査
+        run: |
+          set -euo pipefail
+          JAR=$(ls build/libs/*.jar | head -n 1)
+          echo "::notice::ビルド成果物: $JAR"
+          jar tf "$JAR"
+          echo "--- META-INF/mods.toml ---"
+          unzip -p "$JAR" META-INF/mods.toml
+          echo "--- pack.mcmeta ---"
+          unzip -p "$JAR" pack.mcmeta
+          unzip -p "$JAR" META-INF/mods.toml | grep -F 'modId="spacecraft"'
+
+      - name: mod JAR を Artifact として保存
+        uses: actions/upload-artifact@v4
+        with:
+          name: spacecraft-1.20.1-forge
+          path: build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,20 @@
+# Gradle
+.gradle/
+build/
+run/
+runs/
+
+# Generated datagen cache
+src/generated/resources/.cache/
+
+# IDEs
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+
+# NOTE: dist/ is intentionally NOT ignored - it holds the built mod JAR.
