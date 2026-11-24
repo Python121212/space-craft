@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
-"""アイテムの **3D モデル・テクスチャ・一覧用 3D 画像**を生成する（標準ライブラリのみ）。
+"""`画像/` の見本テクスチャから **3D モデル・実テクスチャ・一覧用 3D 画像**を生成する。
 
     python3 tools/itemart.py wrench
 
-生成物（すべて同じ `MODEL_DEFS` と同じ 16x16 パレットテクスチャ由来）:
+**`画像/` はユーザーが「こんなテクスチャにして」という見本を置く場所**です。
+ここに置かれた PNG を唯一の source として、次を一括生成します（標準ライブラリのみ）:
 
+    src/main/resources/assets/spacecraft/textures/item/<id>.png  … 見本を 16x16 に落とした実テクスチャ
     src/main/resources/assets/spacecraft/models/item/<id>.json   … ゲームに読み込まれる 3D モデル
-    src/main/resources/assets/spacecraft/textures/item/<id>.png  … 面の色を決める 16x16 テクスチャ
     アイテム一覧/models/<id>.json                                … 上記モデルの説明用の写し
     アイテム一覧/images/<id>_3d.svg                              … 単体の 3D 全体図
     アイテム一覧/images/<id>_inventory.svg                       … スロット内の 3D
     アイテム一覧/images/<id>_held.svg                            … 手に持った 3D
 
-**これから追加するアイテムはすべて 3D です。** 2D のスプライト（`item/generated` の
-layer0 だけ）には戻さないでください。新しいアイテムは `MODEL_DEFS` に `elements` を
-足すだけで、ゲーム内モデルと 3 枚の画像が同時に更新されます。
+3D モデルの各面の `faces.uv` は **16x16 テクスチャ上の実ピクセル**を指します。
+`tools/model3d.py` がその uv の色で SVG の面を塗るため、ゲーム内のテクスチャと
+一覧の 3D 画像は常に同じ見本画像由来の配色になります。2D スプライトには戻しません。
 
-3D の描画そのものは `tools/model3d.py` にあります（catalog.py と共用）。
+見本 PNG はインデックスカラー / RGB / RGBA / 透過 / 全 PNG filter に対応しています
+（`tools/model3d.py` の read_png）。白一色 `#ffffff` の背景だけを透過に変換します。
 """
 
 from __future__ import annotations
@@ -29,26 +31,29 @@ import sys
 import zlib
 from pathlib import Path
 
-from model3d import bounds, document, place, scene
+from model3d import bounds, document, place, read_png, scene
 
 ROOT = Path(__file__).resolve().parents[1]
 ITEM_LIST = ROOT / "アイテム一覧"
+SOURCE_DIR = ROOT / "画像"
 ASSET_MODELS = ROOT / "src/main/resources/assets/spacecraft/models/item"
 ASSET_TEXTURES = ROOT / "src/main/resources/assets/spacecraft/textures/item"
 ID_RE = re.compile(r"^[a-z0-9_]+$")
 
-# 16x16 パレット（象限ごとに面の役割を割り当てる）
-LIGHT = (214, 223, 233, 255)  # 上面
-METAL = (150, 163, 178, 255)  # 側面
-DARK = (75, 86, 102, 255)    # 下面・影
-GRIP = (56, 68, 82, 255)     # グリップ
-CYAN = (79, 209, 197, 255)   # 宇宙クラフトのアクセント（グリップ端面）
+# id -> `画像/` に置かれた見本テクスチャ
+SOURCE_FILES = {
+    "wrench": "IMG_809df39f-4a58-433f-b6f5-0b58e51e80d2.png",
+}
 
-UV_LIGHT = (0, 0, 8, 8)
-UV_METAL = (8, 0, 16, 8)
-UV_DARK = (0, 8, 8, 16)
-UV_GRIP = (8, 8, 16, 16)
-UV_ACCENT = (10, 10, 14, 14)
+# 16x16 テクスチャ上の実ピクセル座標（見本画像から抽出した色）
+#   (9,4)=#f6f6f6 ハイライト / (9,6)=#c5c5c5 中間 / (10,6)=#9f9f9f 影 /
+#   (8,5)=#282828 黒アウトライン / (9,7)=#a8a8a8 中間の別階調
+# すべて不透明ピクセルを指すため、3D 画像が既定色にフォールバックしません。
+UV_UP = (9, 4, 10, 5)
+UV_SIDE = (9, 6, 10, 7)
+UV_DOWN = (10, 6, 11, 7)
+UV_OUTLINE = (8, 5, 9, 6)
+UV_ACCENT = (9, 7, 10, 8)
 
 
 def png_bytes(px: list[list[tuple[int, int, int, int]]]) -> bytes:
@@ -75,27 +80,28 @@ def png_bytes(px: list[list[tuple[int, int, int, int]]]) -> bytes:
     )
 
 
-def palette_texture() -> bytes:
-    px = [[LIGHT for _ in range(16)] for _ in range(16)]
-    for y in range(16):
-        for x in range(16):
-            if x < 8 and y < 8:
-                px[y][x] = LIGHT
-            elif x >= 8 and y < 8:
-                px[y][x] = METAL
-            elif x < 8 and y >= 8:
-                px[y][x] = DARK
-            else:
-                px[y][x] = GRIP
-    # 右下象限の一部を差し色に（グリップ端面の uv がここを指す）
-    for y in range(10, 15):
-        for x in range(10, 15):
-            px[y][x] = CYAN
+def source_texture(name: str) -> bytes:
+    """見本 PNG を 16x16 へ落とし、白背景だけ透過にして RGBA PNG を返す。"""
+    src = SOURCE_DIR / name
+    pal = read_png(src)
+    if pal is None:
+        raise FileNotFoundError(
+            f"見本テクスチャを読み込めません: {src}（画像/ に 8bit PNG を置いてください）"
+        )
+    px: list[list[tuple[int, int, int, int]]] = []
+    for gy in range(16):
+        row: list[tuple[int, int, int, int]] = []
+        for gx in range(16):
+            c = pal.pixel_at_uv(gx + 0.5, gy + 0.5)
+            if c[:3] == (255, 255, 255):
+                c = (255, 255, 255, 0)  # 真っ白の背景だけ透過。白に近いハイライトは残す
+            row.append(c)
+        px.append(row)
     return png_bytes(px)
 
 
-def box(x0, y0, z0, x1, y1, z1, *, up=UV_LIGHT, side=UV_METAL, down=UV_DARK, accent=None) -> dict:
-    """1 つの直方体 element。6 面すべてに uv を付けてテクスチャと一致させる。"""
+def box(x0, y0, z0, x1, y1, z1, *, up=UV_UP, side=UV_SIDE, down=UV_DOWN, accent=None) -> dict:
+    """1 つの直方体 element。6 面すべてに実テクスチャの uv を付ける。"""
     uvs = {"up": up, "down": down, "north": side, "south": side, "west": side, "east": side}
     if accent:
         uvs["east"] = accent  # +x 側の端面
@@ -115,11 +121,11 @@ def wrench_model() -> dict:
             "particle": "spacecraft:item/wrench",
         },
         "elements": [
-            box(4, 7, 7, 12, 9, 9),                                          # 柄
-            box(11, 6, 5, 15, 10, 11, up=UV_GRIP, side=UV_GRIP, accent=UV_ACCENT),  # グリップ
-            box(0, 10, 7, 4, 12, 9),                                         # 開口・上あご
-            box(0, 4, 7, 4, 6, 9),                                           # 開口・下あご
-            box(0, 6, 7, 2, 10, 9),                                          # 開口・背
+            box(4, 7, 7, 12, 9, 9),                                            # 柄
+            box(11, 6, 5, 15, 10, 11, up=UV_SIDE, side=UV_ACCENT, accent=UV_OUTLINE),  # グリップ
+            box(0, 10, 7, 4, 12, 9),                                           # 開口・上あご
+            box(0, 4, 7, 4, 6, 9),                                             # 開口・下あご
+            box(0, 6, 7, 2, 10, 9),                                            # 開口・背
         ],
         "display": {
             "gui": {"rotation": [30, 225, 0], "translation": [0, 0, 0], "scale": [0.7, 0.7, 0.7]},
@@ -134,9 +140,10 @@ def wrench_model() -> dict:
 
 MODEL_DEFS = {"wrench": wrench_model()}
 IMAGE_KINDS = ("_3d", "_inventory", "_held")
+STAR = "#8b949e"  # 見本画像のモノクロ配色に合わせた背景の星
 
 
-def centered(model: Path, palette: Path, *, yaw, pitch, scale, cx, cy) -> tuple[list[str], float, float]:
+def centered(model: Path, palette: Path, *, yaw, pitch, scale, cx, cy):
     polys, _ = scene(model, yaw=yaw, pitch=pitch, scale=scale, palette_path=palette)
     minx, miny, maxx, maxy = bounds(polys)
     ox = cx - (minx + maxx) / 2
@@ -150,7 +157,7 @@ def build_images(model: Path, palette: Path, id_: str) -> dict[str, str]:
     # 1) 単体の 3D 全体図
     body, _, _ = centered(model, palette, yaw=45, pitch=32, scale=14, cx=170, cy=132)
     stars = [
-        f'<circle cx="{x}" cy="{y}" r="{r}" fill="#4fd1c5" opacity="0.5"/>'
+        f'<circle cx="{x}" cy="{y}" r="{r}" fill="{STAR}" opacity="0.5"/>'
         for x, y, r in ((36, 38, 1.6), (292, 52, 1.8), (56, 208, 1.1), (270, 210, 1.3))
     ]
     out["_3d"] = document(
@@ -175,9 +182,9 @@ def build_images(model: Path, palette: Path, id_: str) -> dict[str, str]:
     # 3) 手に持った 3D（視点を変えて斜めに構える）
     body, _, _ = centered(model, palette, yaw=22, pitch=24, scale=11, cx=150, cy=122)
     hand = [
-        '<circle cx="40" cy="36" r="1.6" fill="#4fd1c5" opacity="0.55"/>',
-        '<circle cx="278" cy="48" r="1.8" fill="#4fd1c5" opacity="0.55"/>',
-        '<circle cx="296" cy="120" r="1.2" fill="#4fd1c5" opacity="0.45"/>',
+        f'<circle cx="40" cy="36" r="1.6" fill="{STAR}" opacity="0.55"/>',
+        f'<circle cx="278" cy="48" r="1.8" fill="{STAR}" opacity="0.55"/>',
+        f'<circle cx="296" cy="120" r="1.2" fill="{STAR}" opacity="0.45"/>',
         '<path d="M214 260 L232 170 L286 182 L306 260 Z" fill="#b9805c"/>',
         '<path d="M232 170 L286 182 L280 200 L228 188 Z" fill="#d69a72"/>',
     ]
@@ -200,6 +207,15 @@ def main() -> int:
     if args.id not in MODEL_DEFS:
         print(f"エラー: {args.id} の 3D モデル定義がありません（tools/itemart.py の MODEL_DEFS に追加してください）", file=sys.stderr)
         return 1
+    if args.id not in SOURCE_FILES:
+        print(f"エラー: {args.id} の見本テクスチャが 画像/ に登録されていません（SOURCE_FILES に追加してください）", file=sys.stderr)
+        return 1
+
+    try:
+        texture_png = source_texture(SOURCE_FILES[args.id])
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"エラー: {exc}", file=sys.stderr)
+        return 1
 
     model_json = json.dumps(MODEL_DEFS[args.id], indent=2, ensure_ascii=False) + "\n"
     texture = ASSET_TEXTURES / f"{args.id}.png"
@@ -208,7 +224,7 @@ def main() -> int:
 
     for path in (texture, asset_model, list_model):
         path.parent.mkdir(parents=True, exist_ok=True)
-    texture.write_bytes(palette_texture())
+    texture.write_bytes(texture_png)
     asset_model.write_text(model_json, encoding="utf-8")
     list_model.write_text(model_json, encoding="utf-8")
 
@@ -218,12 +234,13 @@ def main() -> int:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(svg, encoding="utf-8")
 
+    print(f"見本: {SOURCE_DIR / SOURCE_FILES[args.id]} → 16x16 に変換（白背景のみ透過）")
     for path in (asset_model, texture, list_model):
         print(f"生成: {path.relative_to(ROOT)}  ({path.stat().st_size} bytes)")
     for kind in IMAGE_KINDS:
         path = ITEM_LIST / "images" / f"{args.id}{kind}.svg"
         print(f"生成: {path.relative_to(ROOT)}  ({path.stat().st_size} bytes)")
-    print("      3 枚の画像はすべて同じ 3D モデル JSON とテクスチャから組み立てています。")
+    print("      3 枚の画像はすべて同じ 3D モデル JSON と実テクスチャから組み立てています。")
     return 0
 
 

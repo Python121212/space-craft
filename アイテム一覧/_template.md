@@ -40,7 +40,8 @@
 | 用途 | パス |
 | --- | --- |
 | アイテムモデル（`elements` 必須） | `src/main/resources/assets/spacecraft/models/item/<id>.json` |
-| テクスチャ（16×16 パレット） | `src/main/resources/assets/spacecraft/textures/item/<id>.png` |
+| テクスチャ（`画像/` の見本を 16×16 に） | `src/main/resources/assets/spacecraft/textures/item/<id>.png` |
+| **見本テクスチャ（source）** | [`../画像/`](../画像/README.md) に置いた PNG |
 | **説明用の写し（必須）** | [`models/<id>.json`](models/<id>.json) |
 
 ## 使い方（すべて書く）

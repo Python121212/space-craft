@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - 'arena/**'
-    # 一覧ドキュメント（md / 画像 / モデル JSON）の更新だけではビルドしない
+    # 一覧ドキュメントと 画像/ の見本（md / 画像 / モデル JSON）だけではビルドしない
     paths-ignore:
       - 'アイテム一覧/**'
       - 'block一覧/**'
@@ -14,6 +14,7 @@ on:
       - 'エンティティ一覧（スポーンエッグに限る）/**'
       - '一覧の使い方.md'
       - 'tools/**'
+      - '画像/**'
   workflow_dispatch:
 
 permissions:

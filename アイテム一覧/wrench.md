@@ -1,6 +1,6 @@
 # レンチ（`spacecraft:wrench`）
 
-> `catalog.py new` で作成し、**3D モデル由来の画像**を埋め込んだファイルです。
+> `catalog.py new` で作成し、**`画像/` の見本テクスチャ由来の 3D 画像**を埋め込んだファイルです。
 > 共通手順は [`一覧の使い方.md`](../一覧の使い方.md) を参照。
 
 ## 基本情報
@@ -15,13 +15,23 @@
 | 登録先 | `DeferredRegister<Item>` + `DeferredRegister<CreativeModeTab>` |
 | クリエイティブタブ | **宇宙クラフト**（`spacecraft:spacecraft`） |
 | 見た目 | **3D モデル**（`block/block` 継承 + `elements` 5 個の直方体） |
+| テクスチャ source | [`画像/IMG_809df39f-4a58-433f-b6f5-0b58e51e80d2.png`](../画像/IMG_809df39f-4a58-433f-b6f5-0b58e51e80d2.png) |
 | 状態 | **実装済み** |
 | 最終更新 | 2026-11-24 |
+
+## 元テクスチャ（ユーザー指定の見本）
+
+[`画像/`](../画像/README.md) に置かれた見本です。256×256 のインデックスカラー PNG で、**16×16 のドット絵を 16 倍に拡大**したものです。白背景・黒アウトライン・銀のグラデーション、斜めの柄と U 字の開口が特徴です。
+
+![ユーザー指定の見本テクスチャ](../画像/IMG_809df39f-4a58-433f-b6f5-0b58e51e80d2.png)
+
+`python3 tools/itemart.py wrench` がこれを 16×16 に落とし、真っ白 `#ffffff` の背景だけ透過にして実テクスチャにします。
 
 ## 画像（すべて 3D）
 
 3 枚とも [`models/wrench.json`](models/wrench.json) の `elements` と、実テクスチャの `faces.uv` から
 [`tools/model3d.py`](../tools/model3d.py) が等角投影で組み立てたものです。視点・背景だけが違います。
+**面の色はすべて見本画像の実ピクセル色**なので、テクスチャと 3D 画像の配色は一致します。
 
 | 種類 | ファイル | 状態 |
 | --- | --- | --- |
@@ -35,18 +45,17 @@
 
 ![手に持ったレンチ（3D）](images/wrench_held.svg)
 
-> `python3 tools/itemart.py wrench` で、ゲーム内モデル・16×16 テクスチャ・3 枚の画像を一括生成できます。
 > **2D のスプライト画像には戻さないでください。** ゲーム内で見た目を確認したいときは `gradle runClient` を使います（画像の差し替えは不要）。
 
 ## モデル・リソース
 
 | 用途 | パス |
 | --- | --- |
+| **見本テクスチャ（source）** | [`../画像/IMG_809df39f-4a58-433f-b6f5-0b58e51e80d2.png`](../画像/IMG_809df39f-4a58-433f-b6f5-0b58e51e80d2.png) |
 | ゲームに読み込まれる 3D モデル | [`../src/main/resources/assets/spacecraft/models/item/wrench.json`](../src/main/resources/assets/spacecraft/models/item/wrench.json) |
 | **説明用の写し（3D 画像の元データ）** | [`models/wrench.json`](models/wrench.json) |
-| 16×16 パレットテクスチャ | [`../src/main/resources/assets/spacecraft/textures/item/wrench.png`](../src/main/resources/assets/spacecraft/textures/item/wrench.png) |
-| 英語名 | `assets/spacecraft/lang/en_us.json` |
-| 日本語名 | `assets/spacecraft/lang/ja_jp.json` |
+| 16×16 実テクスチャ（見本を縮小・白背景透過） | [`../src/main/resources/assets/spacecraft/textures/item/wrench.png`](../src/main/resources/assets/spacecraft/textures/item/wrench.png) |
+| 英語名 / 日本語名 | `assets/spacecraft/lang/{en_us,ja_jp}.json` |
 | 生成ツール | [`../tools/itemart.py`](../tools/itemart.py) / [`../tools/model3d.py`](../tools/model3d.py) |
 
 ### 3D モデルの構成
@@ -56,13 +65,21 @@
 | element | `from` → `to` | 役割 |
 | --- | --- | --- |
 | 柄 | `[4,7,7]` → `[12,9,9]` | 中央の金属棒 |
-| グリップ | `[11,6,5]` → `[15,10,11]` | 右端の握り。+x 端面だけ差し色（シアン） |
+| グリップ | `[11,6,5]` → `[15,10,11]` | 右端の握り。+x 端面だけ黒アウトライン |
 | 開口・上あご | `[0,10,7]` → `[4,12,9]` | U 字の上 |
 | 開口・下あご | `[0,4,7]` → `[4,6,9]` | U 字の下 |
 | 開口・背 | `[0,6,7]` → `[2,10,9]` | U 字の左壁 |
 
-テクスチャは 16×16 を 4 象限に分けたパレットです。各面の `uv` が象限を指し、
-上面 = ライト、側面 = メタル、下面 = ダーク、グリップ = 濃色＋端面シアンになります。
+各面の `faces.uv` は **16×16 実テクスチャ上の 1 ピクセル**を指します。見本画像から抽出した実色だけを使っています。
+
+| 役割 | uv | 色 | 見本での意味 |
+| --- | --- | --- | --- |
+| 上面 | `(9,4,10,5)` | `#f6f6f6` | 最も明るいハイライト |
+| 側面 | `(9,6,10,7)` | `#c5c5c5` | 銀の中間色 |
+| 下面 | `(10,6,11,7)` | `#9f9f9f` | 影になった銀 |
+| アウトライン / グリップ端面 | `(8,5,9,6)` | `#282828` | 黒い輪郭 |
+| グリップの別階調 | `(9,7,10,8)` | `#a8a8a8` | 中間の別階調 |
+
 `display` に `gui` / `firstperson_*` / `thirdperson_*` / `ground` を指定しているため、
 インベントリ内・手持ち・三人称・地面に落ちた状態のすべてで立体として表示されます。
 
@@ -129,7 +146,7 @@
 
 - クリエイティブタブ「宇宙クラフト」のアイコン兼最初の登録アイテムです。
 - 今後追加するブロック・装備・エンティティの設定／分解に使う想定です（対応先が出来たら各一覧へリンクを追加）。
-- **今後追加する要素もすべて 3D** です。レンチと同じ `tools/model3d.py` で画像を組み立てます。
+- **今後追加する要素もすべて 3D** で、テクスチャは [`画像/`](../画像/README.md) の見本を source にします。
 - ブロックタグ・アイテムタグ: 未設定。
 
 ### 制限・注意
@@ -138,6 +155,7 @@
 - ディメンション・ゲームモード・権限による制限はありません。
 - 現状は 3D モデル・テクスチャ・言語ファイルのみで、レシピと戦利品テーブルは未実装です。
 - `tools/model3d.py` は `elements` の `from` / `to` / `faces.uv` に対応していますが、`elements[].rotation` と親モデルの継承解決はまだ未対応です（レンチはどちらも使っていません）。
+- PNG リーダーは 8bit の color type 0 / 2 / 3 / 4 / 6、全 filter、tRNS に対応。インターレースと 16bit は非対応です。
 
 ### 既知の問題
 
@@ -151,7 +169,8 @@
 | 右クリックしても何も起きない | 向きを持たないブロック | `oak_stairs` や `furnace` など `facing` を持つブロックで試す |
 | 紫黒のチェック柄になる | テクスチャ／モデルのパス不一致 | `textures/item/wrench.png` と `models/item/wrench.json` の `textures."0"` を確認 |
 | 平らな板に見える / 立体にならない | `elements` が読まれていない | `parent: block/block` と `elements` の有無、`models/wrench.json` との差分を確認 |
-| 面の色がおかしい | `uv` とパレットの象限がずれている | `tools/itemart.py wrench` を再実行してテクスチャとモデルを再生成 |
+| 3D 画像の面が灰色（既定色）になる | `uv` が透明ピクセルを指している | [`画像/README.md`](../画像/README.md) の手順で不透明ピクセルへ `UV_*` を合わせ直す |
+| 見本と色が違う | 見本を差し替えた後に再生成していない | `画像/` の PNG と `itemart.py` の `SOURCE_FILES` を確認し、`python3 tools/itemart.py wrench` を再実行 |
 | タブに出ない | 登録失敗 | `latest.log` の `Registry` エラーを確認し、`ITEMS.register(bus)` が呼ばれているか見る |
 | 名前が `item.spacecraft.wrench` と出る | 言語ファイル未読込 | `assets/spacecraft/lang/ja_jp.json` / `en_us.json` の配置を確認 |
 
@@ -159,6 +178,7 @@
 
 - `src/main/java/io/github/python121212/spacecraft/SpaceCraft.java`
 - `src/main/java/io/github/python121212/spacecraft/item/WrenchItem.java`
+- [`../画像/IMG_809df39f-4a58-433f-b6f5-0b58e51e80d2.png`](../画像/IMG_809df39f-4a58-433f-b6f5-0b58e51e80d2.png)
 - `src/main/resources/assets/spacecraft/models/item/wrench.json`
 - `src/main/resources/assets/spacecraft/textures/item/wrench.png`
 - `src/main/resources/assets/spacecraft/lang/{en_us,ja_jp}.json`
@@ -169,12 +189,13 @@
 ## 追加時チェックリスト
 
 - [x] `<...>` をすべて埋めた
+- [x] `画像/` の見本テクスチャを source にした
 - [x] `models/wrench.json` に 3D の `elements` を作った
 - [x] `images/wrench_3d.svg` を置いた
 - [x] `images/wrench_inventory.svg` を置いた
 - [x] `images/wrench_held.svg` を置いた
 - [x] md の画像コメントを外し、3 枚すべてを表示した
-- [x] md から 3D モデルの JSON へリンクした
+- [x] md から 3D モデルの JSON と見本テクスチャへリンクした
 - [x] 「使い方」をすべて書いた
 - [x] [`README.md`](README.md) の表に 1 行追加した
 - [x] `python3 tools/catalog.py check --strict` がエラー 0 / 警告 0 で通った
