@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: 'build-${{ github.ref }}'
@@ -57,3 +57,24 @@ jobs:
           path: build/libs/*.jar
           if-no-files-found: error
           retention-days: 30
+
+      - name: GitHub Release に jar を添付
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION=$(grep '^mod_version=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
+          TAG="v${VERSION}"
+          JAR=$(ls build/libs/*.jar | head -n 1)
+          NOTES="Minecraft 1.20.1 / Forge 47.x 向けの空の mod です。JDK 17 + Gradle 8.1.1 でビルドした jar を添付しています。ブロック・アイテムなどは未登録で、Forge が mod として読み込むことだけを確認する jar です。Forge 47.x の mods/ に置いて起動すると、Mods 一覧に Space Craft と表示されます。"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "既存リリース $TAG のアセットを差し替えます"
+            gh release upload "$TAG" "$JAR" --clobber
+          else
+            echo "リリース $TAG を新規作成します"
+            gh release create "$TAG" "$JAR" --title "Space Craft $TAG" --notes "$NOTES"
+          fi
+
+          gh release view "$TAG" --json tagName,assets --jq '{tagName, assets:[.assets[].name]}'
