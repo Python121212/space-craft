@@ -1,84 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="224" viewBox="0 0 200 224" role="img" aria-label="wrench のインベントリ内の状態">
-  <rect width="100%" height="100%" fill="#1b1e24" rx="8"/>
-  <rect x="36" y="30" width="128" height="128" fill="#8b8b8b" stroke="#373737" stroke-width="4"/>
-  <path d="M40 34 L160 34 L40 154 Z" fill="#ffffff" opacity="0.12"/>
-  <path d="M160 34 L160 154 L40 154 Z" fill="#000000" opacity="0.18"/>
-  <g transform="translate(52,46) scale(6)" shape-rendering="crispEdges">
-    <rect x="1" y="4" width="1" height="1" fill="#262c36"/>
-    <rect x="2" y="4" width="1" height="1" fill="#262c36"/>
-    <rect x="3" y="4" width="1" height="1" fill="#262c36"/>
-    <rect x="4" y="4" width="1" height="1" fill="#262c36"/>
-    <rect x="0" y="5" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="5" width="1" height="1" fill="#96a3b2"/>
-    <rect x="2" y="5" width="1" height="1" fill="#96a3b2"/>
-    <rect x="3" y="5" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="5" width="1" height="1" fill="#96a3b2"/>
-    <rect x="0" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="6" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="5" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="6" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="7" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="8" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="9" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="10" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="11" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="12" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="13" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="14" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="15" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="0" y="7" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="7" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="5" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="6" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="7" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="8" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="9" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="10" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="11" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="12" y="7" width="1" height="1" fill="#4fd1c5"/>
-    <rect x="13" y="7" width="1" height="1" fill="#4fd1c5"/>
-    <rect x="14" y="7" width="1" height="1" fill="#384452"/>
-    <rect x="15" y="7" width="1" height="1" fill="#262c36"/>
-    <rect x="0" y="8" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="5" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="6" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="7" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="8" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="9" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="10" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="11" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="12" y="8" width="1" height="1" fill="#4fd1c5"/>
-    <rect x="13" y="8" width="1" height="1" fill="#4fd1c5"/>
-    <rect x="14" y="8" width="1" height="1" fill="#384452"/>
-    <rect x="15" y="8" width="1" height="1" fill="#262c36"/>
-    <rect x="0" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="9" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="5" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="6" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="7" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="8" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="9" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="10" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="11" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="12" y="9" width="1" height="1" fill="#384452"/>
-    <rect x="13" y="9" width="1" height="1" fill="#384452"/>
-    <rect x="14" y="9" width="1" height="1" fill="#384452"/>
-    <rect x="15" y="9" width="1" height="1" fill="#384452"/>
-    <rect x="0" y="10" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="10" width="1" height="1" fill="#96a3b2"/>
-    <rect x="2" y="10" width="1" height="1" fill="#96a3b2"/>
-    <rect x="3" y="10" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="10" width="1" height="1" fill="#96a3b2"/>
-    <rect x="1" y="11" width="1" height="1" fill="#262c36"/>
-    <rect x="2" y="11" width="1" height="1" fill="#262c36"/>
-    <rect x="3" y="11" width="1" height="1" fill="#262c36"/>
-    <rect x="4" y="11" width="1" height="1" fill="#262c36"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="230" viewBox="0 0 240 230" role="img" aria-label="spacecraft:wrench — インベントリ内の状態（3D）">
+  <rect width="100%" height="100%" fill="#15181e" rx="8"/>
+  <rect x="48" y="24" width="144" height="144" fill="#8b8b8b" stroke="#373737" stroke-width="4"/>
+  <path d="M52 28 L188 28 L52 164 Z" fill="#ffffff" opacity="0.12"/>
+  <path d="M188 28 L188 164 L52 164 Z" fill="#000000" opacity="0.18"/>
+  <g transform="translate(116.99,101.86)">
+    <polygon points="-42.07,-12.32 -18.03,-0.30 -30.05,5.71 -54.09,-6.31" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-54.09,8.41 -30.05,20.43 -30.05,5.71 -54.09,-6.31" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-30.05,20.43 -18.03,14.42 -18.03,-0.30 -30.05,5.71" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-54.09,-6.31 -42.07,-0.30 -42.07,-29.75 -54.09,-35.76" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-42.07,-0.30 -30.05,-6.31 -30.05,-35.76 -42.07,-29.75" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-42.07,-41.77 -30.05,-35.76 -42.07,-29.75 -54.09,-35.76" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-42.07,-56.49 -18.03,-44.47 -30.05,-38.46 -54.09,-50.48" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-54.09,-35.76 -30.05,-23.74 -30.05,-38.46 -54.09,-50.48" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-30.05,-23.74 -18.03,-29.75 -18.03,-44.47 -30.05,-38.46" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-18.03,-22.39 30.05,1.65 18.03,7.66 -30.05,-16.38" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-30.05,-1.65 18.03,22.39 18.03,7.66 -30.05,-16.38" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="18.03,22.39 30.05,16.38 30.05,1.65 18.03,7.66" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="36.06,-14.72 60.10,-2.70 24.04,15.33 -0.00,3.31" fill="#4fd1c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="24.04,44.77 60.10,26.74 60.10,-2.70 24.04,15.33" fill="#4fd1c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-0.00,32.75 24.04,44.77 24.04,15.33 -0.00,3.31" fill="#4fd1c5" stroke="#2b3038" stroke-width="1.2"/>
   </g>
-  <text x="100" y="190" fill="#e6edf3" font-family="sans-serif" font-size="14" text-anchor="middle">spacecraft:wrench</text>
-  <text x="100" y="210" fill="#8b949e" font-family="sans-serif" font-size="11" text-anchor="middle">インベントリ内の状態（実テクスチャから生成）</text>
+  <text x="120" y="210" fill="#8b949e" font-family="sans-serif" font-size="11" text-anchor="middle">spacecraft:wrench — インベントリ内の状態（3D）</text>
 </svg>

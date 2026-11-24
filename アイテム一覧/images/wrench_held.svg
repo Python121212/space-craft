@@ -1,90 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240" role="img" aria-label="wrench を手に持った状態">
-  <rect width="100%" height="100%" fill="#101820" rx="8"/>
-  <circle cx="36" cy="32" r="1.6" fill="#4fd1c5" opacity="0.55"/>
-  <circle cx="82" cy="58" r="1.1" fill="#4fd1c5" opacity="0.55"/>
-  <circle cx="268" cy="44" r="1.8" fill="#4fd1c5" opacity="0.55"/>
-  <circle cx="298" cy="96" r="1.2" fill="#4fd1c5" opacity="0.55"/>
-  <circle cx="52" cy="120" r="1.0" fill="#4fd1c5" opacity="0.55"/>
-  <path d="M214 240 L232 156 L286 168 L306 240 Z" fill="#b9805c"/>
-  <path d="M232 156 L286 168 L280 186 L228 174 Z" fill="#d69a72"/>
-  <g transform="translate(126,74) rotate(-34 48 48)">
-  <g transform="translate(0,0) scale(5)" shape-rendering="crispEdges">
-    <rect x="1" y="4" width="1" height="1" fill="#262c36"/>
-    <rect x="2" y="4" width="1" height="1" fill="#262c36"/>
-    <rect x="3" y="4" width="1" height="1" fill="#262c36"/>
-    <rect x="4" y="4" width="1" height="1" fill="#262c36"/>
-    <rect x="0" y="5" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="5" width="1" height="1" fill="#96a3b2"/>
-    <rect x="2" y="5" width="1" height="1" fill="#96a3b2"/>
-    <rect x="3" y="5" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="5" width="1" height="1" fill="#96a3b2"/>
-    <rect x="0" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="6" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="5" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="6" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="7" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="8" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="9" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="10" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="11" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="12" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="13" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="14" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="15" y="6" width="1" height="1" fill="#262c36"/>
-    <rect x="0" y="7" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="7" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="5" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="6" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="7" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="8" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="9" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="10" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="11" y="7" width="1" height="1" fill="#d6dfe9"/>
-    <rect x="12" y="7" width="1" height="1" fill="#4fd1c5"/>
-    <rect x="13" y="7" width="1" height="1" fill="#4fd1c5"/>
-    <rect x="14" y="7" width="1" height="1" fill="#384452"/>
-    <rect x="15" y="7" width="1" height="1" fill="#262c36"/>
-    <rect x="0" y="8" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="5" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="6" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="7" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="8" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="9" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="10" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="11" y="8" width="1" height="1" fill="#96a3b2"/>
-    <rect x="12" y="8" width="1" height="1" fill="#4fd1c5"/>
-    <rect x="13" y="8" width="1" height="1" fill="#4fd1c5"/>
-    <rect x="14" y="8" width="1" height="1" fill="#384452"/>
-    <rect x="15" y="8" width="1" height="1" fill="#262c36"/>
-    <rect x="0" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="9" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="5" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="6" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="7" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="8" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="9" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="10" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="11" y="9" width="1" height="1" fill="#262c36"/>
-    <rect x="12" y="9" width="1" height="1" fill="#384452"/>
-    <rect x="13" y="9" width="1" height="1" fill="#384452"/>
-    <rect x="14" y="9" width="1" height="1" fill="#384452"/>
-    <rect x="15" y="9" width="1" height="1" fill="#384452"/>
-    <rect x="0" y="10" width="1" height="1" fill="#262c36"/>
-    <rect x="1" y="10" width="1" height="1" fill="#96a3b2"/>
-    <rect x="2" y="10" width="1" height="1" fill="#96a3b2"/>
-    <rect x="3" y="10" width="1" height="1" fill="#96a3b2"/>
-    <rect x="4" y="10" width="1" height="1" fill="#96a3b2"/>
-    <rect x="1" y="11" width="1" height="1" fill="#262c36"/>
-    <rect x="2" y="11" width="1" height="1" fill="#262c36"/>
-    <rect x="3" y="11" width="1" height="1" fill="#262c36"/>
-    <rect x="4" y="11" width="1" height="1" fill="#262c36"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="260" viewBox="0 0 320 260" role="img" aria-label="spacecraft:wrench — 手に持った状態（3D）">
+  <rect width="100%" height="100%" fill="#15181e" rx="8"/>
+  <circle cx="40" cy="36" r="1.6" fill="#4fd1c5" opacity="0.55"/>
+  <circle cx="278" cy="48" r="1.8" fill="#4fd1c5" opacity="0.55"/>
+  <circle cx="296" cy="120" r="1.2" fill="#4fd1c5" opacity="0.45"/>
+  <path d="M214 260 L232 170 L286 182 L306 260 Z" fill="#b9805c"/>
+  <path d="M232 170 L286 182 L280 200 L228 188 Z" fill="#d69a72"/>
+  <g transform="translate(141.86,132.45)">
+    <polygon points="-43.16,8.69 -26.68,25.28 -26.68,5.18 -43.16,-11.41" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-22.77,-14.76 -6.28,1.83 -26.68,5.18 -43.16,-11.41" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-43.16,-11.41 -34.92,-3.12 -34.92,-43.31 -43.16,-51.61" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-22.77,-54.96 -14.53,-46.66 -34.92,-43.31 -43.16,-51.61" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-34.92,-3.12 -14.53,-6.47 -14.53,-46.66 -34.92,-43.31" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-26.68,25.28 -6.28,21.93 -6.28,1.83 -26.68,5.18" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-43.16,-51.61 -26.68,-35.02 -26.68,-55.11 -43.16,-71.71" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-22.77,-75.06 -6.28,-58.47 -26.68,-55.11 -43.16,-71.71" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-26.68,-35.02 -6.28,-38.37 -6.28,-58.47 -26.68,-55.11" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-26.68,-4.87 6.28,28.32 6.28,8.22 -26.68,-24.97" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-6.28,-28.32 26.68,4.87 6.28,8.22 -26.68,-24.97" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="6.28,28.32 26.68,24.97 26.68,4.87 6.28,8.22" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="42.96,-12.68 59.44,3.91 -1.75,13.97 -18.24,-2.62" fill="#4fd1c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-18.24,37.57 -1.75,54.16 -1.75,13.97 -18.24,-2.62" fill="#4fd1c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-1.75,54.16 59.44,44.11 59.44,3.91 -1.75,13.97" fill="#4fd1c5" stroke="#2b3038" stroke-width="1.2"/>
   </g>
-  </g>
-  <text x="160" y="34" fill="#e6edf3" font-family="sans-serif" font-size="14" text-anchor="middle">spacecraft:wrench</text>
-  <text x="160" y="224" fill="#8b949e" font-family="sans-serif" font-size="11" text-anchor="middle">手に持った状態（実テクスチャから生成）</text>
+  <text x="160" y="242" fill="#8b949e" font-family="sans-serif" font-size="11" text-anchor="middle">spacecraft:wrench — 手に持った状態（3D）</text>
 </svg>

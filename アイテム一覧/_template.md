@@ -21,21 +21,27 @@
 
 | 種類 | ファイル | 状態 |
 | --- | --- | --- |
-| **インベントリ内の状態** | `images/<id>_inventory.png` | 未配置 |
-| **手に持った状態** | `images/<id>_held.png` | 未配置 |
+| **3D モデル全体図**（`elements` 由来） | `images/<id>_3d.svg` | 未配置 |
+| **インベントリ内の状態**（3D） | `images/<id>_inventory.svg` | 未配置 |
+| **手に持った状態**（3D） | `images/<id>_held.svg` | 未配置 |
+
+> **アイテムは必ず 3D です。** `item/generated` の 2D スプライトには戻さないでください。
+> 3 枚とも `models/<id>.json` の `elements` と実テクスチャの `uv` から `tools/model3d.py` が組み立てます。
+> `python3 tools/itemart.py <id>` でゲーム内モデル・テクスチャ・3 枚の画像を一括生成できます。
 
 画像を `images/` に置いたら、下のコメントを外してください（相対パスで参照します）。
 
-<!-- ![インベントリ内の <日本語名>](images/<id>_inventory.png) -->
-<!-- ![手に持った <日本語名>](images/<id>_held.png) -->
+<!-- ![<日本語名> の 3D モデル](images/<id>_3d.svg) -->
+<!-- ![インベントリ内の <日本語名>](images/<id>_inventory.svg) -->
+<!-- ![手に持った <日本語名>](images/<id>_held.svg) -->
 
 ## モデル・リソース
 
 | 用途 | パス |
 | --- | --- |
-| アイテムモデル | `src/main/resources/assets/spacecraft/models/item/<id>.json` |
-| テクスチャ | `src/main/resources/assets/spacecraft/textures/item/<id>.png` |
-| 説明用の写し | `models/<id>.json`（任意） |
+| アイテムモデル（`elements` 必須） | `src/main/resources/assets/spacecraft/models/item/<id>.json` |
+| テクスチャ（16×16 パレット） | `src/main/resources/assets/spacecraft/textures/item/<id>.png` |
+| **説明用の写し（必須）** | [`models/<id>.json`](models/<id>.json) |
 
 ## 使い方（すべて書く）
 
@@ -60,7 +66,7 @@
 - 捨てた・燃やした・爆発したとき: <挙動>
 
 ### 手に持った状態の挙動
-- 一人称 / 三人称の見た目: <説明。画像 `..._held.png` と対応>
+- 一人称 / 三人称の見た目: <説明。画像 `..._held.svg` と対応>
 - 持ち替え・オフハンド: <可否と挙動>
 
 ### レシピ
@@ -104,8 +110,8 @@
 ## 追加時チェックリスト
 
 - [ ] `<...>` をすべて埋めた
-- [ ] `images/<id>_inventory.png` を置いた
-- [ ] `images/<id>_held.png` を置いた
+- [ ] `models/<id>.json` に 3D の `elements` を作った
+- [ ] `images/<id>_3d.svg` / `<id>_inventory.svg` / `<id>_held.svg` を置いた（すべて 3D）
 - [ ] md の画像コメントを外した
 - [ ] 「使い方」をすべて書いた
 - [ ] [`README.md`](README.md) の表に 1 行追加した

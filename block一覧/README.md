@@ -1,6 +1,6 @@
 # block一覧
 
-`spacecraft` に **ブロック**を追加したときに更新する一覧です。
+`spacecraft` に **ブロック**を追加したときに更新する一覧です。**ブロックはすべて 3D モデルで登録します**。
 共通の手順・命名規則は [`一覧の使い方.md`](../一覧の使い方.md) にあります。
 
 ## 使い方（ブロックを 1 つ追加したら）
@@ -8,7 +8,7 @@
 1. [`_template.md`](_template.md) を `<id>.md` にコピーします（例 `moon_rock.md`）。
 2. `<...>` をすべて埋め、**「使い方」をすべて書きます**。
 3. **`models/<id>.json`** と **`blockstates/<id>.json`** を作ります（`_example_model.json` / `_example_blockstate.json` が見本です）。
-4. その JSON の要素・面・テクスチャから組み立てた **3D 画像**を `images/<id>_3d.png` に置きます。
+4. その JSON の `elements`・各面の `uv` から組み立てた **3D 画像**を `images/<id>_3d.svg` に置きます（`catalog.py render` で自動生成）。
 5. md から JSON へリンクし、画像コメントを外して表示されるようにします。
 6. 下の表に 1 行追加します。
 7. **ビルドは不要**です。この一覧の変更は CI にも jar にも影響しません。
@@ -33,7 +33,7 @@ block一覧/
 ├── <id>.md                    ← ブロックごとの説明
 ├── models/<id>.json
 ├── blockstates/<id>.json
-└── images/<id>_3d.png
+└── images/<id>_3d.svg
 ```
 
 ## 3D 画像の見本
@@ -44,7 +44,7 @@ block一覧/
 
 ## 3D 画像について
 
-「json などを使用し組み立てた 3D 画像」とは、`models/<id>.json` の `elements`（`from` / `to`）と各面の `texture` を元に等角投影などで描き起こした画像のことです。**元データの JSON を必ず一緒に残し、md からリンクしてください**。画像だけを置かないでください。
+「json などを使用し組み立てた 3D 画像」とは、`models/<id>.json` の `elements`（`from` / `to`）と各面の `texture` / `uv` を元に、`tools/model3d.py` が等角投影で描き起こした画像のことです。**元データの JSON を必ず一緒に残し、md からリンクしてください**。画像だけを置かないでください。
 
 ## 注意
 

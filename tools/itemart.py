@@ -1,90 +1,62 @@
 #!/usr/bin/env python3
-"""アイテムのテクスチャと、一覧 md 用の画像を生成する（標準ライブラリのみ・外部依存なし）。
+"""アイテムの **3D モデル・テクスチャ・一覧用 3D 画像**を生成する（標準ライブラリのみ）。
 
     python3 tools/itemart.py wrench
 
-生成物:
-    src/main/resources/assets/spacecraft/textures/item/<id>.png  … 16x16 の実テクスチャ
-    アイテム一覧/images/<id>_inventory.svg … インベントリ内の状態
-    アイテム一覧/images/<id>_held.svg      … 手に持った状態
+生成物（すべて同じ `MODEL_DEFS` と同じ 16x16 パレットテクスチャ由来）:
 
-画像はすべて**同じ実テクスチャから組み立てた模式図**です。ゲーム内スクリーンショットが
-撮れるようになったら同名の PNG を置き、md の画像リンクと表の拡張子を .svg → .png に
-書き換えてください（catalog.py はどちらの拡張子も受理します）。
+    src/main/resources/assets/spacecraft/models/item/<id>.json   … ゲームに読み込まれる 3D モデル
+    src/main/resources/assets/spacecraft/textures/item/<id>.png  … 面の色を決める 16x16 テクスチャ
+    アイテム一覧/models/<id>.json                                … 上記モデルの説明用の写し
+    アイテム一覧/images/<id>_3d.svg                              … 単体の 3D 全体図
+    アイテム一覧/images/<id>_inventory.svg                       … スロット内の 3D
+    アイテム一覧/images/<id>_held.svg                            … 手に持った 3D
 
-SVG は PNG を data URI で埋め込まず、16x16 のピクセルを <rect> に展開します。
-GitHub の md サニタイズでも消えず、そのまま表示できます。
+**これから追加するアイテムはすべて 3D です。** 2D のスプライト（`item/generated` の
+layer0 だけ）には戻さないでください。新しいアイテムは `MODEL_DEFS` に `elements` を
+足すだけで、ゲーム内モデルと 3 枚の画像が同時に更新されます。
+
+3D の描画そのものは `tools/model3d.py` にあります（catalog.py と共用）。
 """
 
 from __future__ import annotations
 
 import argparse
-import html
+import json
 import re
 import struct
 import sys
 import zlib
 from pathlib import Path
 
+from model3d import bounds, document, place, scene
+
 ROOT = Path(__file__).resolve().parents[1]
 ITEM_LIST = ROOT / "アイテム一覧"
-TEXTURE_DIR = ROOT / "src/main/resources/assets/spacecraft/textures/item"
+ASSET_MODELS = ROOT / "src/main/resources/assets/spacecraft/models/item"
+ASSET_TEXTURES = ROOT / "src/main/resources/assets/spacecraft/textures/item"
 ID_RE = re.compile(r"^[a-z0-9_]+$")
 
-# RGBA
-TRANSPARENT = (0, 0, 0, 0)
-OUTLINE = (38, 44, 54, 255)
-METAL = (150, 163, 178, 255)
-LIGHT = (214, 223, 233, 255)
-GRIP = (56, 68, 82, 255)
-CYAN = (79, 209, 197, 255)  # 宇宙クラフトのアクセント
+# 16x16 パレット（象限ごとに面の役割を割り当てる）
+LIGHT = (214, 223, 233, 255)  # 上面
+METAL = (150, 163, 178, 255)  # 側面
+DARK = (75, 86, 102, 255)    # 下面・影
+GRIP = (56, 68, 82, 255)     # グリップ
+CYAN = (79, 209, 197, 255)   # 宇宙クラフトのアクセント（グリップ端面）
 
-
-def wrench_texture() -> list[list[tuple[int, int, int, int]]]:
-    """16x16 のレンチ（左に開口・中央に柄・右にグリップ）。"""
-    px = [[TRANSPARENT for _ in range(16)] for _ in range(16)]
-
-    def fill(x0: int, y0: int, x1: int, y1: int, color: tuple[int, int, int, int]) -> None:
-        for y in range(y0, y1 + 1):
-            for x in range(x0, x1 + 1):
-                if 0 <= x < 16 and 0 <= y < 16:
-                    px[y][x] = color
-
-    # 右端のグリップ
-    fill(11, 6, 15, 9, GRIP)
-    fill(11, 6, 15, 6, OUTLINE)
-    fill(15, 7, 15, 8, OUTLINE)
-    fill(12, 7, 13, 8, CYAN)
-
-    # 中央の柄
-    fill(4, 7, 11, 8, METAL)
-    fill(4, 7, 11, 7, LIGHT)
-    fill(4, 6, 11, 6, OUTLINE)
-    fill(4, 9, 11, 9, OUTLINE)
-
-    # 左端の開口（C 字）
-    fill(1, 4, 4, 4, OUTLINE)
-    fill(1, 5, 4, 5, METAL)
-    fill(0, 5, 0, 10, OUTLINE)
-    fill(1, 6, 1, 9, METAL)
-    fill(1, 10, 4, 10, METAL)
-    fill(1, 11, 4, 11, OUTLINE)
-    fill(2, 6, 3, 9, TRANSPARENT)  # U 字の穴
-    return px
-
-
-def texture_for(id_: str) -> list[list[tuple[int, int, int, int]]]:
-    if id_ == "wrench":
-        return wrench_texture()
-    raise ValueError(f"テクスチャ定義がありません: {id_}（tools/itemart.py に追加してください）")
+UV_LIGHT = (0, 0, 8, 8)
+UV_METAL = (8, 0, 16, 8)
+UV_DARK = (0, 8, 8, 16)
+UV_GRIP = (8, 8, 16, 16)
+UV_ACCENT = (10, 10, 14, 14)
 
 
 def png_bytes(px: list[list[tuple[int, int, int, int]]]) -> bytes:
-    """RGBA PNG を標準ライブラリだけで書き出す。"""
+    """RGBA PNG を標準ライブラリだけで書き出す（filter 0 固定）。"""
     height, width = len(px), len(px[0])
     raw = bytearray()
     for row in px:
-        raw.append(0)  # filter: None
+        raw.append(0)
         for r, g, b, a in row:
             raw += bytes((r, g, b, a))
 
@@ -103,95 +75,155 @@ def png_bytes(px: list[list[tuple[int, int, int, int]]]) -> bytes:
     )
 
 
-def pixel_rects(px: list[list[tuple[int, int, int, int]]], scale: int, ox: int, oy: int) -> list[str]:
-    """16x16 の各ピクセルを <rect> に展開（data URI を使わない）。"""
-    lines = [f'  <g transform="translate({ox},{oy}) scale({scale})" shape-rendering="crispEdges">']
-    for y, row in enumerate(px):
-        for x, (r, g, b, a) in enumerate(row):
-            if a:
-                lines.append(f'    <rect x="{x}" y="{y}" width="1" height="1" fill="#{r:02x}{g:02x}{b:02x}"/>')
-    lines.append("  </g>")
-    return lines
+def palette_texture() -> bytes:
+    px = [[LIGHT for _ in range(16)] for _ in range(16)]
+    for y in range(16):
+        for x in range(16):
+            if x < 8 and y < 8:
+                px[y][x] = LIGHT
+            elif x >= 8 and y < 8:
+                px[y][x] = METAL
+            elif x < 8 and y >= 8:
+                px[y][x] = DARK
+            else:
+                px[y][x] = GRIP
+    # 右下象限の一部を差し色に（グリップ端面の uv がここを指す）
+    for y in range(10, 15):
+        for x in range(10, 15):
+            px[y][x] = CYAN
+    return png_bytes(px)
 
 
-def inventory_svg(px, id_: str) -> str:
-    lines = [
-        '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="224" '
-        'viewBox="0 0 200 224" role="img" '
-        f'aria-label="{html.escape(id_)} のインベントリ内の状態">',
-        '  <rect width="100%" height="100%" fill="#1b1e24" rx="8"/>',
-        '  <rect x="36" y="30" width="128" height="128" fill="#8b8b8b" stroke="#373737" stroke-width="4"/>',
-        '  <path d="M40 34 L160 34 L40 154 Z" fill="#ffffff" opacity="0.12"/>',
-        '  <path d="M160 34 L160 154 L40 154 Z" fill="#000000" opacity="0.18"/>',
-    ]
-    lines += pixel_rects(px, 6, 52, 46)
-    lines += [
-        f'  <text x="100" y="190" fill="#e6edf3" font-family="sans-serif" font-size="14" '
-        f'text-anchor="middle">spacecraft:{html.escape(id_)}</text>',
-        '  <text x="100" y="210" fill="#8b949e" font-family="sans-serif" font-size="11" '
-        'text-anchor="middle">インベントリ内の状態（実テクスチャから生成）</text>',
-        "</svg>",
-    ]
-    return "\n".join(lines) + "\n"
+def box(x0, y0, z0, x1, y1, z1, *, up=UV_LIGHT, side=UV_METAL, down=UV_DARK, accent=None) -> dict:
+    """1 つの直方体 element。6 面すべてに uv を付けてテクスチャと一致させる。"""
+    uvs = {"up": up, "down": down, "north": side, "south": side, "west": side, "east": side}
+    if accent:
+        uvs["east"] = accent  # +x 側の端面
+    return {
+        "from": [x0, y0, z0],
+        "to": [x1, y1, z1],
+        "faces": {name: {"texture": "#0", "uv": list(uv)} for name, uv in uvs.items()},
+    }
 
 
-def held_svg(px, id_: str) -> str:
-    lines = [
-        '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" '
-        'viewBox="0 0 320 240" role="img" '
-        f'aria-label="{html.escape(id_)} を手に持った状態">',
-        '  <rect width="100%" height="100%" fill="#101820" rx="8"/>',
+def wrench_model() -> dict:
+    """横に寝かせたレンチ。柄・グリップ・U 字の開口を 5 つの直方体で構成する。"""
+    return {
+        "parent": "block/block",
+        "textures": {
+            "0": "spacecraft:item/wrench",
+            "particle": "spacecraft:item/wrench",
+        },
+        "elements": [
+            box(4, 7, 7, 12, 9, 9),                                          # 柄
+            box(11, 6, 5, 15, 10, 11, up=UV_GRIP, side=UV_GRIP, accent=UV_ACCENT),  # グリップ
+            box(0, 10, 7, 4, 12, 9),                                         # 開口・上あご
+            box(0, 4, 7, 4, 6, 9),                                           # 開口・下あご
+            box(0, 6, 7, 2, 10, 9),                                          # 開口・背
+        ],
+        "display": {
+            "gui": {"rotation": [30, 225, 0], "translation": [0, 0, 0], "scale": [0.7, 0.7, 0.7]},
+            "ground": {"rotation": [0, 0, 0], "translation": [0, 3, 0], "scale": [0.35, 0.35, 0.35]},
+            "thirdperson_righthand": {"rotation": [0, -90, 55], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+            "thirdperson_lefthand": {"rotation": [0, 90, -55], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85]},
+            "firstperson_righthand": {"rotation": [0, -90, 25], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+            "firstperson_lefthand": {"rotation": [0, 90, -25], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
+        },
+    }
+
+
+MODEL_DEFS = {"wrench": wrench_model()}
+IMAGE_KINDS = ("_3d", "_inventory", "_held")
+
+
+def centered(model: Path, palette: Path, *, yaw, pitch, scale, cx, cy) -> tuple[list[str], float, float]:
+    polys, _ = scene(model, yaw=yaw, pitch=pitch, scale=scale, palette_path=palette)
+    minx, miny, maxx, maxy = bounds(polys)
+    ox = cx - (minx + maxx) / 2
+    oy = cy - (miny + maxy) / 2
+    return place(polys, ox, oy), maxx - minx, maxy - miny
+
+
+def build_images(model: Path, palette: Path, id_: str) -> dict[str, str]:
+    out: dict[str, str] = {}
+
+    # 1) 単体の 3D 全体図
+    body, _, _ = centered(model, palette, yaw=45, pitch=32, scale=14, cx=170, cy=132)
+    stars = [
+        f'<circle cx="{x}" cy="{y}" r="{r}" fill="#4fd1c5" opacity="0.5"/>'
+        for x, y, r in ((36, 38, 1.6), (292, 52, 1.8), (56, 208, 1.1), (270, 210, 1.3))
     ]
-    # 宇宙っぽい背景の星
-    for x, y, r in ((36, 32, 1.6), (82, 58, 1.1), (268, 44, 1.8), (298, 96, 1.2), (52, 120, 1.0)):
-        lines.append(f'  <circle cx="{x}" cy="{y}" r="{r}" fill="#4fd1c5" opacity="0.55"/>')
-    # 簡易的な腕・手
-    lines += [
-        '  <path d="M214 240 L232 156 L286 168 L306 240 Z" fill="#b9805c"/>',
-        '  <path d="M232 156 L286 168 L280 186 L228 174 Z" fill="#d69a72"/>',
+    out["_3d"] = document(
+        340, 280, body,
+        f"spacecraft:{id_} — 3D モデル（models/{id_}.json 由来）",
+        background=stars, label_y=262,
+    )
+
+    # 2) インベントリスロット内の 3D
+    body, _, _ = centered(model, palette, yaw=45, pitch=30, scale=8.5, cx=120, cy=96)
+    slot = [
+        '<rect x="48" y="24" width="144" height="144" fill="#8b8b8b" stroke="#373737" stroke-width="4"/>',
+        '<path d="M52 28 L188 28 L52 164 Z" fill="#ffffff" opacity="0.12"/>',
+        '<path d="M188 28 L188 164 L52 164 Z" fill="#000000" opacity="0.18"/>',
     ]
-    # レンチを斜めに構える
-    lines.append('  <g transform="translate(126,74) rotate(-34 48 48)">')
-    lines += pixel_rects(px, 5, 0, 0)
-    lines.append("  </g>")
-    lines += [
-        f'  <text x="160" y="34" fill="#e6edf3" font-family="sans-serif" font-size="14" '
-        f'text-anchor="middle">spacecraft:{html.escape(id_)}</text>',
-        '  <text x="160" y="224" fill="#8b949e" font-family="sans-serif" font-size="11" '
-        'text-anchor="middle">手に持った状態（実テクスチャから生成）</text>',
-        "</svg>",
+    out["_inventory"] = document(
+        240, 230, body,
+        f"spacecraft:{id_} — インベントリ内の状態（3D）",
+        background=slot, label_y=210,
+    )
+
+    # 3) 手に持った 3D（視点を変えて斜めに構える）
+    body, _, _ = centered(model, palette, yaw=22, pitch=24, scale=11, cx=150, cy=122)
+    hand = [
+        '<circle cx="40" cy="36" r="1.6" fill="#4fd1c5" opacity="0.55"/>',
+        '<circle cx="278" cy="48" r="1.8" fill="#4fd1c5" opacity="0.55"/>',
+        '<circle cx="296" cy="120" r="1.2" fill="#4fd1c5" opacity="0.45"/>',
+        '<path d="M214 260 L232 170 L286 182 L306 260 Z" fill="#b9805c"/>',
+        '<path d="M232 170 L286 182 L280 200 L228 188 Z" fill="#d69a72"/>',
     ]
-    return "\n".join(lines) + "\n"
+    out["_held"] = document(
+        320, 260, body,
+        f"spacecraft:{id_} — 手に持った状態（3D）",
+        background=hand, label_y=242,
+    )
+    return out
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("id", help="アイテム id（現在は wrench のみ）")
+    ap.add_argument("id", help=f"アイテム id（現在: {', '.join(MODEL_DEFS)}）")
     args = ap.parse_args()
 
     if not ID_RE.match(args.id):
         print("エラー: id は半角英小文字・数字・アンダースコアのみ", file=sys.stderr)
         return 1
-    try:
-        px = texture_for(args.id)
-    except ValueError as exc:
-        print(f"エラー: {exc}", file=sys.stderr)
+    if args.id not in MODEL_DEFS:
+        print(f"エラー: {args.id} の 3D モデル定義がありません（tools/itemart.py の MODEL_DEFS に追加してください）", file=sys.stderr)
         return 1
 
-    png = png_bytes(px)
-    texture = TEXTURE_DIR / f"{args.id}.png"
-    inventory = ITEM_LIST / "images" / f"{args.id}_inventory.svg"
-    held = ITEM_LIST / "images" / f"{args.id}_held.svg"
-    for path in (texture, inventory, held):
+    model_json = json.dumps(MODEL_DEFS[args.id], indent=2, ensure_ascii=False) + "\n"
+    texture = ASSET_TEXTURES / f"{args.id}.png"
+    asset_model = ASSET_MODELS / f"{args.id}.json"
+    list_model = ITEM_LIST / "models" / f"{args.id}.json"
+
+    for path in (texture, asset_model, list_model):
         path.parent.mkdir(parents=True, exist_ok=True)
+    texture.write_bytes(palette_texture())
+    asset_model.write_text(model_json, encoding="utf-8")
+    list_model.write_text(model_json, encoding="utf-8")
 
-    texture.write_bytes(png)
-    inventory.write_text(inventory_svg(px, args.id), encoding="utf-8")
-    held.write_text(held_svg(px, args.id), encoding="utf-8")
+    images = build_images(list_model, texture, args.id)
+    for kind, svg in images.items():
+        path = ITEM_LIST / "images" / f"{args.id}{kind}.svg"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(svg, encoding="utf-8")
 
-    for path in (texture, inventory, held):
+    for path in (asset_model, texture, list_model):
         print(f"生成: {path.relative_to(ROOT)}  ({path.stat().st_size} bytes)")
-    print("      3 点はすべて同じ 16x16 テクスチャから組み立てています。")
+    for kind in IMAGE_KINDS:
+        path = ITEM_LIST / "images" / f"{args.id}{kind}.svg"
+        print(f"生成: {path.relative_to(ROOT)}  ({path.stat().st_size} bytes)")
+    print("      3 枚の画像はすべて同じ 3D モデル JSON とテクスチャから組み立てています。")
     return 0
 
 

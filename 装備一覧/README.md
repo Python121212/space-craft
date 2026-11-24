@@ -1,6 +1,6 @@
 # 装備一覧
 
-`spacecraft` に **装備**（防具・武器・ツール・アクセサリ・Curios スロット品）を追加したときに更新する一覧です。
+`spacecraft` に **装備**（防具・武器・ツール・アクセサリ・Curios スロット品）を追加したときに更新する一覧です。**装備はすべて 3D モデルで登録します**。
 共通の手順・命名規則は [`一覧の使い方.md`](../一覧の使い方.md) にあります。
 
 ## 使い方（装備を 1 つ追加したら）
@@ -8,11 +8,11 @@
 1. [`_template.md`](_template.md) を `<id>.md` にコピーします（例 `space_helmet.md`）。
 2. `<...>` をすべて埋め、**「使い方」をすべて書きます**。
 3. **`models/<id>.json`** を作ります（`_example_model.json` が見本です）。
-4. その JSON などから組み立てた画像と、ゲーム内撮影の画像を `images/` に置きます:
-   - `<id>_held.png` … **手に持った状態**（JSON モデル由来）
-   - `<id>_inventory.png` … **インベントリ内の状態**
-   - `<id>_equipped.png` … **装備した状態**
-   - `<id>_3d.png` … モデルの 3D 画像（任意）
+4. その JSON の `elements` から組み立てた **3D 画像**を `images/` に置きます（すべて 3D）:
+   - `<id>_3d.svg` … **3D モデル全体図**（必須）
+   - `<id>_held.svg` … **手に持った状態**（3D）
+   - `<id>_inventory.svg` … **インベントリ内の状態**（3D）
+   - `<id>_equipped.svg` … **装備した状態**（3D）
 5. md から JSON へリンクし、画像コメントを外して表示されるようにします。
 6. 下の表に 1 行追加します。
 7. **ビルドは不要**です。この一覧の変更は CI にも jar にも影響しません。
@@ -36,10 +36,10 @@
 ├── <id>.md                ← 装備ごとの説明
 ├── models/<id>.json
 └── images/
-    ├── <id>_held.png
-    ├── <id>_inventory.png
-    ├── <id>_equipped.png
-    └── <id>_3d.png
+    ├── <id>_3d.svg
+    ├── <id>_held.svg
+    ├── <id>_inventory.svg
+    └── <id>_equipped.svg
 ```
 
 ## 3D 画像の見本
@@ -50,7 +50,7 @@
 
 ## 3D 画像について
 
-「json などを使用し組み立て」た手持ち・3D 画像は、`models/<id>.json` の `elements` と各面の `texture` を元にします。**元データの JSON を必ず残し、md からリンクしてください**。インベントリ内・装備時は開発用クライアントでのスクリーンショットを使います。
+4 枚すべてを `models/<id>.json` の `elements` と各面の `texture` / `uv` から `tools/model3d.py` が組み立てます。**元データの JSON を必ず残し、md からリンクしてください**。2D のスクリーンショットは使いません。
 
 ## 注意
 
