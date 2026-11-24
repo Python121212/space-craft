@@ -48,7 +48,17 @@ jobs:
           gradle-version: '8.1.1'
 
       - name: gradle build を実行
-        run: gradle build --no-daemon --stacktrace
+        id: build
+        run: |
+          set -o pipefail
+          gradle build --no-daemon --stacktrace 2>&1 | tee /tmp/gradle-build.log
+
+      # ログの実体を取得できない環境でも、失敗原因を PR のアノテーションで読めるようにする
+      - name: ビルドエラーの要約を表示
+        if: failure() && steps.build.outcome == 'failure'
+        run: |
+          grep -E '(error:|FAILURE:|What went wrong|^\* Try|FAILED$|Execution failed|Caused by:|cannot find symbol|incompatible types|no suitable method|does not exist|Compilation failed)' /tmp/gradle-build.log \
+            | head -n 40 | while IFS= read -r line; do echo "::error::$line"; done
 
       - name: 生成された JAR を検査
         run: |
