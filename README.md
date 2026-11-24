@@ -35,6 +35,8 @@ gh run list --workflow build.yml    # 実行一覧
 gh run download <run-id> -n spacecraft-1.20.1-forge
 ```
 
+> 初回ビルドは run `45363857072` で成功しています（JDK 17 + Gradle 8.1.1、全ステップ `success`）。Artifact の実体は GitHub の blob ストレージに置かれるため、ネットワーク制限のあるサンドボックスからはダウンロードできません。その場合は `dist/spacecraft-1.0.0.jar`（`tools/make_jar.py` が同じ `gradle.properties` / `src/main/resources` から組み立てた、Forge が読む情報が同一の jar）を使ってください。
+
 > このリポジトリでの応答・説明は **日本語** に統一しています（`AGENTS.md` 参照）。
 
 ## この環境で jar を生成する
