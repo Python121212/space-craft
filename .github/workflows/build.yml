@@ -5,6 +5,15 @@ on:
     branches:
       - main
       - 'arena/**'
+    # 一覧ドキュメント（md / 画像 / モデル JSON）の更新だけではビルドしない
+    paths-ignore:
+      - 'アイテム一覧/**'
+      - 'block一覧/**'
+      - 'Ui一覧/**'
+      - '装備一覧/**'
+      - 'エンティティ一覧（スポーンエッグに限る）/**'
+      - '一覧の使い方.md'
+      - 'tools/**'
   workflow_dispatch:
 
 permissions:
