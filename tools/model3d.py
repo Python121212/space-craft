@@ -12,7 +12,7 @@
 
 まだ対応していないもの（必要になったら拡張してください）:
     elements[].rotation、parent の継承、面ごとのテクスチャ補間
-    （1 面は uv の中心色で塗ります。16x16 のパレットテクスチャを想定）
+    （1 面は uv の中心色で塗ります。`画像/` の見本を 16x16 に落とした実テクスチャを想定）
 """
 
 from __future__ import annotations
@@ -50,62 +50,128 @@ def element_faces(el: dict) -> list[tuple[str, tuple[int, int, int], list[tuple[
 
 
 class Palette:
-    """16x16 などのテクスチャ PNG から、uv の中心色を取り出す簡易リーダー。"""
+    """テクスチャ PNG を RGBA に正規化して保持し、uv の中心色を取り出すリーダー。
 
-    def __init__(self, width: int, height: int, rows: list[list[tuple[int, ...]]], bpp: int):
-        self.width, self.height, self.rows, self.bpp = width, height, rows, bpp
+    `rows[y][x]` は常に (r, g, b, a)。Minecraft の uv は 0..16 で指定されるため、
+    画像の実サイズが 256x256 でも同じ座標が対応するブロックを指します。
+    """
+
+    def __init__(self, width: int, height: int, rows: list[list[tuple[int, int, int, int]]]):
+        self.width, self.height, self.rows = width, height, rows
+
+    def pixel(self, x: int, y: int) -> tuple[int, int, int, int]:
+        return self.rows[max(0, min(self.height - 1, y))][max(0, min(self.width - 1, x))]
 
     def sample(self, uv: list[float] | None) -> str | None:
         if not uv or len(uv) != 4:
             return None
-        # Minecraft の uv はテクスチャのピクセル単位（16x16 を想定）
+        # Minecraft の uv は 0..16 のテクスチャ座標。実画像サイズへ比例させる。
         u = (uv[0] + uv[2]) / 2 / 16 * self.width
         v = (uv[1] + uv[3]) / 2 / 16 * self.height
-        x = max(0, min(self.width - 1, int(u)))
-        y = max(0, min(self.height - 1, int(v)))
-        px = self.rows[y][x]
-        r, g, b = px[0], px[1], px[2]
-        if self.bpp == 4 and px[3] < 128:  # 透明なら既定色に任せる
+        r, g, b, a = self.pixel(int(u), int(v))
+        if a < 128:  # 透明なら既定色に任せる
             return None
         return f"#{r:02x}{g:02x}{b:02x}"
 
+    def pixel_at_uv(self, x: float, y: float) -> tuple[int, int, int, int]:
+        """0..16 の uv 座標から 1 ピクセルを取得（16x16 へのダウンサンプル用）。"""
+        return self.pixel(int(x / 16 * self.width), int(y / 16 * self.height))
 
-def read_palette(path: Path) -> Palette | None:
-    """自作 PNG（RGBA / RGB、filter 0 のみ）を読む。外部ライブラリは不要。"""
+
+def _paeth(a: int, b: int, c: int) -> int:
+    p = a + b - c
+    pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+    return a if pa <= pb and pa <= pc else (b if pb <= pc else c)
+
+
+def read_png(path: Path) -> Palette | None:
+    """PNG を標準ライブラリだけで RGBA に復号する。
+
+    対応: color type 0 / 2 / 3 / 4 / 6（gray / RGB / パレット / gray+α / RGBA）、
+    全 filter（None / Sub / Up / Average / Paeth）、tRNS、8bit。
+    非対応: インターレース、16bit（ユーザーが `画像/` に置く普通の PNG はほぼ 8bit です）。
+    """
+    path = Path(path)
     if not path.is_file():
         return None
     data = path.read_bytes()
     if data[:8] != b"\x89PNG\r\n\x1a\n":
         return None
     off, idat = 8, bytearray()
-    width = height = depth = ctype = None
+    width = height = depth = ctype = interlace = None
+    plte: bytes | None = None
+    trns: bytes | None = None
     while off + 8 <= len(data):
         size = struct.unpack_from(">I", data, off)[0]
         tag = data[off + 4:off + 8]
         chunk = data[off + 8:off + 8 + size]
         off += 12 + size
         if tag == b"IHDR":
-            width, height, depth, ctype = struct.unpack_from(">IIBB", chunk)[:4]
+            width, height, depth, ctype, _comp, _filt, interlace = struct.unpack_from(">IIBBBBB", chunk)
+        elif tag == b"PLTE":
+            plte = chunk
+        elif tag == b"tRNS":
+            trns = chunk
         elif tag == b"IDAT":
             idat += chunk
         elif tag == b"IEND":
             break
-    if not (width and height and depth == 8 and ctype in (2, 6)):
+    if not (width and height and depth == 8 and ctype in (0, 2, 3, 4, 6) and interlace == 0):
         return None
-    bpp = 4 if ctype == 6 else 3
+    if ctype == 3 and not plte:
+        return None
+    bpp = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}[ctype]
     raw = zlib.decompress(bytes(idat))
     stride = width * bpp
-    rows: list[list[tuple[int, ...]]] = []
+    decoded: list[bytes] = []
     pos = 0
     for _ in range(height):
         filt = raw[pos]
         pos += 1
-        line = raw[pos:pos + stride]
+        line = bytearray(raw[pos:pos + stride])
         pos += stride
-        if filt != 0:
-            raise ValueError(f"PNG filter {filt} は未対応です（filter 0 の PNG を使ってください）: {path}")
-        rows.append([tuple(line[i:i + bpp]) for i in range(0, stride, bpp)])
-    return Palette(width, height, rows, bpp)
+        if filt:
+            for i in range(stride):
+                a = line[i - bpp] if i >= bpp else 0
+                b = decoded[-1][i] if decoded else 0
+                c = decoded[-1][i - bpp] if decoded and i >= bpp else 0
+                if filt == 1:
+                    line[i] = (line[i] + a) & 0xFF
+                elif filt == 2:
+                    line[i] = (line[i] + b) & 0xFF
+                elif filt == 3:
+                    line[i] = (line[i] + (a + b) // 2) & 0xFF
+                elif filt == 4:
+                    line[i] = (line[i] + _paeth(a, b, c)) & 0xFF
+                else:
+                    raise ValueError(f"不明な PNG filter {filt}: {path}")
+        decoded.append(bytes(line))
+
+    rows: list[list[tuple[int, int, int, int]]] = []
+    for y in range(height):
+        line = decoded[y]
+        row: list[tuple[int, int, int, int]] = []
+        for x in range(width):
+            px = line[x * bpp:(x + 1) * bpp]
+            if ctype == 2:
+                row.append((px[0], px[1], px[2], 255))
+            elif ctype == 6:
+                row.append((px[0], px[1], px[2], px[3]))
+            elif ctype == 0:
+                row.append((px[0], px[0], px[0], 255))
+            elif ctype == 4:
+                row.append((px[0], px[0], px[0], px[1]))
+            else:  # ctype == 3（インデックスカラー）
+                i = px[0]
+                r, g, b = plte[i * 3:i * 3 + 3]
+                a = trns[i] if trns and i < len(trns) else 255
+                row.append((r, g, b, a))
+        rows.append(row)
+    return Palette(width, height, rows)
+
+
+# 旧名も残す（catalog.py などからの互換用）
+read_palette = read_png
 
 
 def camera_basis(yaw: float, pitch: float):

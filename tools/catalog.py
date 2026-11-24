@@ -112,6 +112,17 @@ def cmd_check(strict: bool = False) -> int:
     errors: list[str] = []
     warnings: list[str] = []
 
+    # ユーザーがテクスチャ見本を置くフォルダ（itemart.py の source）
+    img_dir = ROOT / "画像"
+    if not img_dir.is_dir():
+        errors.append("[画像] ディレクトリがありません（ユーザーがテクスチャ見本を置く場所です）")
+    else:
+        for placeholder in ("ここに追加", "自分が追加"):
+            if not (img_dir / placeholder).exists():
+                warnings.append(f"[画像] {placeholder} がありません（ユーザー作成のプレースホルダは残してください）")
+        if not any(img_dir.glob("*.png")):
+            warnings.append("[画像] 見本 PNG がありません（itemart.py の source になります）")
+
     for name, cfg in CATEGORIES.items():
         d = cat_dir(name)
         if not d.is_dir():

@@ -9,7 +9,8 @@
 | --- | --- | --- |
 | **レンチ** | `spacecraft:wrench` | ブロックを右クリックすると `BlockState` を時計回りに 90 度回転。スタック 1・耐久なし |
 
-- **3D モデル**: `block/block` 継承の `elements` 5 個（柄・グリップ・U 字の開口）で構成。16×16 パレットテクスチャの `uv` が面の色を決めます。インベントリ内・手持ち・三人称・地面に落ちた状態のすべてで立体として表示されます。
+- **3D モデル**: `block/block` 継承の `elements` 5 個（柄・グリップ・U 字の開口）で構成。インベントリ内・手持ち・三人称・地面に落ちた状態のすべてで立体として表示されます。
+- **テクスチャ**: [`画像/`](画像/README.md) に置かれた見本（16×16 ドット絵の拡大 PNG）を source にしています。`itemart.py` が 16×16 へ落として白背景のみ透過し、各面の `uv` がその実ピクセル色を指すため、3D 画像の配色も見本と一致します。
 - クリエイティブタブ「**宇宙クラフト**」（`spacecraft:spacecraft`）に登録済み。タブのアイコンもレンチです。
 - 英語名 `Wrench` / 日本語名 `レンチ`（`lang/en_us.json` / `lang/ja_jp.json`）。
 - アイテムの詳細・3 枚の 3D 画像は [`アイテム一覧/wrench.md`](アイテム一覧/wrench.md) にあります。
@@ -44,7 +45,7 @@ gh workflow run build.yml
 gh run list --workflow build.yml
 ```
 
-> 一覧ドキュメント（`アイテム一覧/` など 5 つ・`一覧の使い方.md`・`tools/**`）だけを更新した場合、`paths-ignore` により **CI は起動しません**。実装コードや `src/main/resources/` のモデルを触ったときだけビルドされます。
+> 一覧ドキュメント（`アイテム一覧/` など 5 つ・`一覧の使い方.md`・`tools/**`・`画像/**`）だけを更新した場合、`paths-ignore` により **CI は起動しません**。実装コードや `src/main/resources/` のモデルを触ったときだけビルドされます。
 > ビルドが失敗したときはエラー要約がアノテーションに出ます（sandbox からログの実体を取得できないため）。
 > サンドボックスからは Artifact / ログの実体（GitHub の blob ストレージ）をダウンロードできませんが、ビルドと Release への添付は GitHub 側で完結します。
 > 使用するアクションは **Node.js 24 対応のメジャー**（`checkout@v7` / `setup-java@v6` / `setup-gradle@v5` / `upload-artifact@v7`）に統一しています。
@@ -64,7 +65,7 @@ gh run list --workflow build.yml
 | --- | --- |
 | [`tools/catalog.py`](tools/catalog.py) | `list` / `check` / `new` / `render`（一覧管理・3D 画像の生成入口） |
 | [`tools/model3d.py`](tools/model3d.py) | モデル JSON → 3D SVG の共通レンダラ（カメラ・背面カリング・`uv` による配色） |
-| [`tools/itemart.py`](tools/itemart.py) | アイテムの 3D モデル定義・16×16 テクスチャ・3 枚の 3D 画像を一元生成 |
+| [`tools/itemart.py`](tools/itemart.py) | `画像/` の見本を source に、3D モデル・16×16 実テクスチャ・3 枚の 3D 画像を一元生成 |
 
 どちらも **Python 標準ライブラリのみ**で、ビルドには組み込まれていません。
 
@@ -111,13 +112,16 @@ src/main/java/.../SpaceCraft.java        エントリポイント・登録
 src/main/java/.../item/WrenchItem.java   レンチの挙動
 src/main/resources/assets/spacecraft/
     models/item/wrench.json      3D モデル（elements）
-    textures/item/wrench.png     16x16 パレットテクスチャ
+    textures/item/wrench.png     16x16 実テクスチャ（画像/ の見本由来）
     lang/{en_us,ja_jp}.json     名前
 src/main/resources/META-INF/mods.toml
 src/main/resources/pack.mcmeta
 tools/catalog.py                 一覧管理（Python）
 tools/model3d.py                 3D レンダラ（Python・catalog / itemart 共用）
 tools/itemart.py                 3D モデル・テクスチャ・画像生成（Python）
+画像/                            ユーザーが置くテクスチャ見本（source）
+    IMG_809df39f-...png          現在のレンチの見本
+    ここに追加 / 自分が追加      プレースホルダ（残す）
 一覧の使い方.md                  5 一覧の運用ルール（3D 必須）
 アイテム一覧/
     wrench.md                    使い方をすべて記載

@@ -4,21 +4,21 @@
   <path d="M52 28 L188 28 L52 164 Z" fill="#ffffff" opacity="0.12"/>
   <path d="M188 28 L188 164 L52 164 Z" fill="#000000" opacity="0.18"/>
   <g transform="translate(116.99,101.86)">
-    <polygon points="-42.07,-12.32 -18.03,-0.30 -30.05,5.71 -54.09,-6.31" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-54.09,8.41 -30.05,20.43 -30.05,5.71 -54.09,-6.31" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-30.05,20.43 -18.03,14.42 -18.03,-0.30 -30.05,5.71" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-54.09,-6.31 -42.07,-0.30 -42.07,-29.75 -54.09,-35.76" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-42.07,-0.30 -30.05,-6.31 -30.05,-35.76 -42.07,-29.75" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-42.07,-41.77 -30.05,-35.76 -42.07,-29.75 -54.09,-35.76" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-42.07,-56.49 -18.03,-44.47 -30.05,-38.46 -54.09,-50.48" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-54.09,-35.76 -30.05,-23.74 -30.05,-38.46 -54.09,-50.48" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-30.05,-23.74 -18.03,-29.75 -18.03,-44.47 -30.05,-38.46" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-18.03,-22.39 30.05,1.65 18.03,7.66 -30.05,-16.38" fill="#d6dfe9" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-30.05,-1.65 18.03,22.39 18.03,7.66 -30.05,-16.38" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="18.03,22.39 30.05,16.38 30.05,1.65 18.03,7.66" fill="#96a3b2" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="36.06,-14.72 60.10,-2.70 24.04,15.33 -0.00,3.31" fill="#4fd1c5" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="24.04,44.77 60.10,26.74 60.10,-2.70 24.04,15.33" fill="#4fd1c5" stroke="#2b3038" stroke-width="1.2"/>
-    <polygon points="-0.00,32.75 24.04,44.77 24.04,15.33 -0.00,3.31" fill="#4fd1c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-42.07,-12.32 -18.03,-0.30 -30.05,5.71 -54.09,-6.31" fill="#f6f6f6" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-54.09,8.41 -30.05,20.43 -30.05,5.71 -54.09,-6.31" fill="#c5c5c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-30.05,20.43 -18.03,14.42 -18.03,-0.30 -30.05,5.71" fill="#c5c5c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-54.09,-6.31 -42.07,-0.30 -42.07,-29.75 -54.09,-35.76" fill="#c5c5c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-42.07,-0.30 -30.05,-6.31 -30.05,-35.76 -42.07,-29.75" fill="#c5c5c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-42.07,-41.77 -30.05,-35.76 -42.07,-29.75 -54.09,-35.76" fill="#f6f6f6" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-42.07,-56.49 -18.03,-44.47 -30.05,-38.46 -54.09,-50.48" fill="#f6f6f6" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-54.09,-35.76 -30.05,-23.74 -30.05,-38.46 -54.09,-50.48" fill="#c5c5c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-30.05,-23.74 -18.03,-29.75 -18.03,-44.47 -30.05,-38.46" fill="#c5c5c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-18.03,-22.39 30.05,1.65 18.03,7.66 -30.05,-16.38" fill="#f6f6f6" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-30.05,-1.65 18.03,22.39 18.03,7.66 -30.05,-16.38" fill="#c5c5c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="18.03,22.39 30.05,16.38 30.05,1.65 18.03,7.66" fill="#c5c5c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="36.06,-14.72 60.10,-2.70 24.04,15.33 -0.00,3.31" fill="#c5c5c5" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="24.04,44.77 60.10,26.74 60.10,-2.70 24.04,15.33" fill="#282828" stroke="#2b3038" stroke-width="1.2"/>
+    <polygon points="-0.00,32.75 24.04,44.77 24.04,15.33 -0.00,3.31" fill="#a8a8a8" stroke="#2b3038" stroke-width="1.2"/>
   </g>
   <text x="120" y="210" fill="#8b949e" font-family="sans-serif" font-size="11" text-anchor="middle">spacecraft:wrench — インベントリ内の状態（3D）</text>
 </svg>
