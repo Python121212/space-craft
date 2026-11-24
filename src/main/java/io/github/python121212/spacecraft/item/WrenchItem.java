@@ -1,7 +1,7 @@
 package io.github.python121212.spacecraft.item;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Rotation;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
