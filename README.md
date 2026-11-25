@@ -10,7 +10,7 @@
 | **レンチ** | `spacecraft:wrench` | ブロックを右クリックすると `BlockState` を時計回りに 90 度回転。スタック 1・耐久なし |
 
 - **3D モデル**: `block/block` 継承の `elements` 5 個（柄・グリップ・U 字の開口）で構成。インベントリ内・手持ち・三人称・地面に落ちた状態のすべてで立体として表示されます。
-- **テクスチャ**: [`画像/`](画像/README.md) に置かれた見本（16×16 ドット絵の拡大 PNG）を source にしています。`itemart.py` が 16×16 へ落として白背景のみ透過し、各面の `uv` がその実ピクセル色を指すため、3D 画像の配色も見本と一致します。
+- **テクスチャ**: [`画像/`](画像/README.md) に置かれた見本（16×16 ドット絵の拡大 PNG）を source にしています。`itemart.py` が **64×64 へエリア平均**で落として白背景を段階透過するため、銀のグラデーションと輪郭のアンチエイリアスが残ります。各面の `uv` がその実ピクセル色を指すので 3D 画像の配色も見本と一致します。
 - クリエイティブタブ「**宇宙クラフト**」（`spacecraft:spacecraft`）に登録済み。タブのアイコンもレンチです。
 - 英語名 `Wrench` / 日本語名 `レンチ`（`lang/en_us.json` / `lang/ja_jp.json`）。
 - アイテムの詳細・3 枚の 3D 画像は [`アイテム一覧/wrench.md`](アイテム一覧/wrench.md) にあります。
@@ -112,7 +112,7 @@ src/main/java/.../SpaceCraft.java        エントリポイント・登録
 src/main/java/.../item/WrenchItem.java   レンチの挙動
 src/main/resources/assets/spacecraft/
     models/item/wrench.json      3D モデル（elements）
-    textures/item/wrench.png     16x16 実テクスチャ（画像/ の見本由来）
+    textures/item/wrench.png     64x64 実テクスチャ（画像/ の見本由来）
     lang/{en_us,ja_jp}.json     名前
 src/main/resources/META-INF/mods.toml
 src/main/resources/pack.mcmeta

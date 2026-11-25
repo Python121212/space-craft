@@ -12,7 +12,7 @@
 
 まだ対応していないもの（必要になったら拡張してください）:
     elements[].rotation、parent の継承、面ごとのテクスチャ補間
-    （1 面は uv の中心色で塗ります。`画像/` の見本を 16x16 に落とした実テクスチャを想定）
+    （1 面は uv 矩形の不透明ピクセルの平均色で塗ります。`画像/` の見本を 64x64 に落とした実テクスチャを想定）
 """
 
 from __future__ import annotations
@@ -50,10 +50,10 @@ def element_faces(el: dict) -> list[tuple[str, tuple[int, int, int], list[tuple[
 
 
 class Palette:
-    """テクスチャ PNG を RGBA に正規化して保持し、uv の中心色を取り出すリーダー。
+    """テクスチャ PNG を RGBA に正規化して保持し、uv 矩形の平均色を取り出すリーダー。
 
-    `rows[y][x]` は常に (r, g, b, a)。Minecraft の uv は 0..16 で指定されるため、
-    画像の実サイズが 256x256 でも同じ座標が対応するブロックを指します。
+    `rows[y][x]` は常に (r, g, b, a)。Minecraft の faces.uv はテクスチャの
+    **実ピクセル単位**で指定するため、16x16 でも 64x64 でも同じ書き方で動きます。
     """
 
     def __init__(self, width: int, height: int, rows: list[list[tuple[int, int, int, int]]]):
@@ -63,18 +63,36 @@ class Palette:
         return self.rows[max(0, min(self.height - 1, y))][max(0, min(self.width - 1, x))]
 
     def sample(self, uv: list[float] | None) -> str | None:
+        """uv 矩形（**実ピクセル単位**）の不透明ピクセルの平均色を返す。
+
+        1 ピクセルだけを取ると見本の階調が失われるため、矩形全体を平均します。
+        Minecraft の faces.uv もテクスチャの実ピクセル単位なので、16x16 でも
+        64x64 でも同じ書き方で動きます。
+        """
         if not uv or len(uv) != 4:
             return None
-        # Minecraft の uv は 0..16 のテクスチャ座標。実画像サイズへ比例させる。
-        u = (uv[0] + uv[2]) / 2 / 16 * self.width
-        v = (uv[1] + uv[3]) / 2 / 16 * self.height
-        r, g, b, a = self.pixel(int(u), int(v))
-        if a < 128:  # 透明なら既定色に任せる
+        x0, y0, x1, y1 = (int(round(v)) for v in uv)
+        if x1 <= x0:
+            x1 = x0 + 1
+        if y1 <= y0:
+            y1 = y0 + 1
+        total = [0, 0, 0]
+        count = 0
+        for y in range(max(0, y0), min(self.height, y1)):
+            for x in range(max(0, x0), min(self.width, x1)):
+                r, g, b, a = self.rows[y][x]
+                if a < 128:
+                    continue
+                total[0] += r
+                total[1] += g
+                total[2] += b
+                count += 1
+        if not count:
             return None
-        return f"#{r:02x}{g:02x}{b:02x}"
+        return "#%02x%02x%02x" % tuple(c // count for c in total)
 
     def pixel_at_uv(self, x: float, y: float) -> tuple[int, int, int, int]:
-        """0..16 の uv 座標から 1 ピクセルを取得（16x16 へのダウンサンプル用）。"""
+        """0..16 の正規化座標から 1 ピクセルを取得（互換用ヘルパー）。"""
         return self.pixel(int(x / 16 * self.width), int(y / 16 * self.height))
 
 

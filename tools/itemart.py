@@ -6,19 +6,26 @@
 **`画像/` はユーザーが「こんなテクスチャにして」という見本を置く場所**です。
 ここに置かれた PNG を唯一の source として、次を一括生成します（標準ライブラリのみ）:
 
-    src/main/resources/assets/spacecraft/textures/item/<id>.png  … 見本を 16x16 に落とした実テクスチャ
+    src/main/resources/assets/spacecraft/textures/item/<id>.png  … 見本を 64x64 に落とした実テクスチャ
     src/main/resources/assets/spacecraft/models/item/<id>.json   … ゲームに読み込まれる 3D モデル
     アイテム一覧/models/<id>.json                                … 上記モデルの説明用の写し
     アイテム一覧/images/<id>_3d.svg                              … 単体の 3D 全体図
     アイテム一覧/images/<id>_inventory.svg                       … スロット内の 3D
     アイテム一覧/images/<id>_held.svg                            … 手に持った 3D
 
-3D モデルの各面の `faces.uv` は **16x16 テクスチャ上の実ピクセル**を指します。
-`tools/model3d.py` がその uv の色で SVG の面を塗るため、ゲーム内のテクスチャと
-一覧の 3D 画像は常に同じ見本画像由来の配色になります。2D スプライトには戻しません。
+## テクスチャを「見本のように」保つ工夫
+
+- 見本は **256x256 = 16x16 ドット絵の 16 倍拡大**ですが、1 セル 1 色に量子化すると
+  銀のグラデーションが失われます。そのため **64x64（4 倍の解像度）へエリア平均**で
+  ダウンサンプルし、見本の 40 色の階調をできるだけ残します。
+- 白背景は「非白ピクセルの割合」でアルファを決めるため、輪郭が白くにじまず
+  アンチエイリアスも再現されます（真っ白な背景だけ完全透過）。
+- 3D モデルの各面 `faces.uv` は **64x64 テクスチャ上の 1 テクセル**を指します。
+  `tools/model3d.py` は uv 矩形の平均色で面を塗るため、1 テクセルなら見本の実色を
+  そのまま、広い矩形なら階調を含めた平均色を 3D 画像へ反映できます。
 
 見本 PNG はインデックスカラー / RGB / RGBA / 透過 / 全 PNG filter に対応しています
-（`tools/model3d.py` の read_png）。白一色 `#ffffff` の背景だけを透過に変換します。
+（`tools/model3d.py` の read_png）。
 """
 
 from __future__ import annotations
@@ -40,20 +47,24 @@ ASSET_MODELS = ROOT / "src/main/resources/assets/spacecraft/models/item"
 ASSET_TEXTURES = ROOT / "src/main/resources/assets/spacecraft/textures/item"
 ID_RE = re.compile(r"^[a-z0-9_]+$")
 
+# 実テクスチャの解像度。見本 256x256 を 64x64 に落とす（1 テクセル = 4x4 元ピクセル）。
+# Minecraft は 16x16 以外のアイテムテクスチャも読み込めます。
+TEXTURE_SIZE = 64
+
 # id -> `画像/` に置かれた見本テクスチャ
 SOURCE_FILES = {
     "wrench": "IMG_809df39f-4a58-433f-b6f5-0b58e51e80d2.png",
 }
 
-# 16x16 テクスチャ上の実ピクセル座標（見本画像から抽出した色）
-#   (9,4)=#f6f6f6 ハイライト / (9,6)=#c5c5c5 中間 / (10,6)=#9f9f9f 影 /
-#   (8,5)=#282828 黒アウトライン / (9,7)=#a8a8a8 中間の別階調
-# すべて不透明ピクセルを指すため、3D 画像が既定色にフォールバックしません。
-UV_UP = (9, 4, 10, 5)
-UV_SIDE = (9, 6, 10, 7)
-UV_DOWN = (10, 6, 11, 7)
-UV_OUTLINE = (8, 5, 9, 6)
-UV_ACCENT = (9, 7, 10, 8)
+# 64x64 テクスチャ上の **1 テクセル**（見本の代表色を点で拾う）
+# 64x64 へエリア平均すると極小のハイライトが消えるため、面の色は 1 ピクセル uv で
+# 見本の実色をそのまま指定します。明るさ順が上→側→別階調→下→輪郭になるよう選択済み。
+# すべて不透明ピクセルなので、3D 画像が既定色にフォールバックしません。
+UV_UP = (14, 46, 15, 47)       # #dedede 上面（最も明るい銀）
+UV_SIDE = (14, 49, 15, 50)     # #c5c5c5 側面
+UV_ACCENT = (12, 51, 13, 52)   # #a7a7a7 グリップの別階調
+UV_DOWN = (49, 27, 50, 28)     # #9f9f9f 下面（影）
+UV_OUTLINE = (7, 50, 8, 51)    # #282828 黒アウトライン
 
 
 def png_bytes(px: list[list[tuple[int, int, int, int]]]) -> bytes:
@@ -81,21 +92,41 @@ def png_bytes(px: list[list[tuple[int, int, int, int]]]) -> bytes:
 
 
 def source_texture(name: str) -> bytes:
-    """見本 PNG を 16x16 へ落とし、白背景だけ透過にして RGBA PNG を返す。"""
+    """見本を 64x64 へエリア平均でダウンサンプルし、白背景を段階的に透過する。"""
     src = SOURCE_DIR / name
     pal = read_png(src)
     if pal is None:
         raise FileNotFoundError(
             f"見本テクスチャを読み込めません: {src}（画像/ に 8bit PNG を置いてください）"
         )
+    n = TEXTURE_SIZE
     px: list[list[tuple[int, int, int, int]]] = []
-    for gy in range(16):
+    for gy in range(n):
         row: list[tuple[int, int, int, int]] = []
-        for gx in range(16):
-            c = pal.pixel_at_uv(gx + 0.5, gy + 0.5)
-            if c[:3] == (255, 255, 255):
-                c = (255, 255, 255, 0)  # 真っ白の背景だけ透過。白に近いハイライトは残す
-            row.append(c)
+        for gx in range(n):
+            x0 = gx * pal.width // n
+            x1 = max(x0 + 1, (gx + 1) * pal.width // n)
+            y0 = gy * pal.height // n
+            y1 = max(y0 + 1, (gy + 1) * pal.height // n)
+            r = g = b = count = 0
+            total = 0
+            for y in range(y0, y1):
+                for x in range(x0, x1):
+                    pr, pg, pb, _pa = pal.pixel(x, y)
+                    total += 1
+                    # 白に近い背景ピクセルは色の平均から除外する（白いフチを防ぐ）
+                    if min(pr, pg, pb) >= 250:
+                        continue
+                    r += pr
+                    g += pg
+                    b += pb
+                    count += 1
+            if count:
+                # 非白ピクセルの割合でアルファを決め、輪郭をアンチエイリアスする
+                alpha = int(255 * count / total)
+                row.append((r // count, g // count, b // count, alpha))
+            else:
+                row.append((255, 255, 255, 0))
         px.append(row)
     return png_bytes(px)
 
@@ -234,7 +265,7 @@ def main() -> int:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(svg, encoding="utf-8")
 
-    print(f"見本: {SOURCE_DIR / SOURCE_FILES[args.id]} → 16x16 に変換（白背景のみ透過）")
+    print(f"見本: {SOURCE_DIR / SOURCE_FILES[args.id]} → {TEXTURE_SIZE}x{TEXTURE_SIZE} へエリア平均（白背景は段階透過）")
     for path in (asset_model, texture, list_model):
         print(f"生成: {path.relative_to(ROOT)}  ({path.stat().st_size} bytes)")
     for kind in IMAGE_KINDS:
