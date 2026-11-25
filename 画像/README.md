@@ -19,33 +19,42 @@ python3 tools/itemart.py wrench
 
 1. [`tools/model3d.py`](../tools/model3d.py) の `read_png` が見本を読みます
    （インデックスカラー / RGB / RGBA / 透過 / 全 PNG filter / tRNS に対応。標準ライブラリのみ）
-2. **16×16 にダウンサンプル**し、真っ白 `#ffffff` の背景だけを透過に変換して
-   [`../src/main/resources/assets/spacecraft/textures/item/wrench.png`](../src/main/resources/assets/spacecraft/textures/item/wrench.png) へ書き出します
-3. 3D モデル [`../src/main/resources/assets/spacecraft/models/item/wrench.json`](../src/main/resources/assets/spacecraft/models/item/wrench.json) の
-   各面 `faces.<面>.uv` が、**その 16×16 テクスチャ上の実ピクセル**を指します
-4. `model3d.py` が同じ `uv` の色で 3D SVG の面を塗るため、
-   **ゲーム内のテクスチャ・3D モデル・一覧の 3 枚の画像はすべて同じ見本画像由来の配色**になります
+2. **64×64 へエリア平均でダウンサンプル**します（1 テクセル = 元画像の 4×4 ピクセル）。
+   1 セル 1 色に量子化していた頃と違い、見本の銀のグラデーションが **149 色の階調**として残ります。
+3. 白背景は「非白ピクセルの割合」でアルファを決めるため、輪郭が白くにじまず
+   アンチエイリアスも再現されます（真っ白な背景だけ完全透過）。
+   成果物は [`../src/main/resources/assets/spacecraft/textures/item/wrench.png`](../src/main/resources/assets/spacecraft/textures/item/wrench.png)。
+4. 3D モデル [`../src/main/resources/assets/spacecraft/models/item/wrench.json`](../src/main/resources/assets/spacecraft/models/item/wrench.json) の
+   各面 `faces.<面>.uv` が、**64×64 テクスチャ上の 1 テクセル**を指します。
+5. `model3d.py` が `uv` 矩形の不透明ピクセルの平均色で 3D SVG の面を塗るため、
+   **ゲーム内のテクスチャ・3D モデル・一覧の 3 枚の画像はすべて同じ見本画像由来の配色**になります。
 
-現在の `uv` は見本から抽出した実色です:
+現在の `uv` は見本から抽出した実色です（明るさ順 → 上面・側面・別階調・下面・輪郭）:
 
-| 役割 | uv | 色 |
+| 役割 | uv（64×64 上の 1 テクセル） | 色 |
 | --- | --- | --- |
-| 上面（ハイライト） | `(9,4)` | `#f6f6f6` |
-| 側面（中間） | `(9,6)` | `#c5c5c5` |
-| 下面（影） | `(10,6)` | `#9f9f9f` |
-| アウトライン | `(8,5)` | `#282828` |
-| グリップの別階調 | `(9,7)` | `#a8a8a8` |
+| 上面（最も明るい銀） | `(14,46,15,47)` | `#dedede` |
+| 側面（中間） | `(14,49,15,50)` | `#c5c5c5` |
+| グリップの別階調 | `(12,51,13,52)` | `#a7a7a7` |
+| 下面（影） | `(49,27,50,28)` | `#9f9f9f` |
+| 黒アウトライン | `(7,50,8,51)` | `#282828` |
+
+> **`uv` を 1 テクセルにしている理由**: 64×64 へエリア平均すると、見本にある極小のハイライト点が
+> 周囲の黒と混ざって消えてしまいます。テクスチャは滑らかなまま、面の色だけを点で拾うことで
+> 上面→側面→下面の明るさ順を保っています。
 
 ## 見本を差し替えたいとき
 
 1. このフォルダに PNG を置く（または既存ファイルを上書きする）
 2. [`../tools/itemart.py`](../tools/itemart.py) の `SOURCE_FILES` に `<id>: ファイル名` を登録する
-3. 必要なら同ファイルの `UV_*` を、新しい見本の**不透明ピクセル**に合わせて調整する
+3. 必要なら同ファイルの `UV_*` を、新しい見本の**不透明な 1 テクセル**に合わせて調整する
    （透明ピクセルを指すと 3D 画像が既定色にフォールバックします）
 4. `python3 tools/itemart.py <id>` を実行し、`python3 tools/catalog.py check --strict` で確認する
 
-> `UV_*` の調整を省略しても生成は動きますが、面の色が見本とずれます。
-> 見本の実ピクセルは `python3 -c "import sys; sys.path.insert(0,'tools'); from model3d import read_png; ..."` で確認できます。
+> `UV_*` の調整を省略しても生成は動きますが、面の色が見本とずれたり明るさ順が崩れたりします。
+> 64×64 テクスチャの実ピクセルは
+> `python3 -c "import sys; sys.path.insert(0,'tools'); from model3d import read_png; ..."` で確認できます。
+> 解像度を変えたいときは `itemart.py` の `TEXTURE_SIZE` を変更してください（Minecraft は 16×16 以外も読み込めます）。
 
 ## ビルドとの関係
 
